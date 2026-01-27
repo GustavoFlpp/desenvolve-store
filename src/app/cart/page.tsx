@@ -4,7 +4,7 @@ import { useCart } from "@/context/CartContext";
 import Link from "next/link";
 
 export default function CartPage() {
-  const { cart, addToCart, removeFromCart, clearCart } = useCart();
+  const { cart, addToCart, decreaseFromCart, removeFromCart, clearCart } = useCart();
 
   const total = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -58,11 +58,7 @@ export default function CartPage() {
                 {/* Controle de quantidade */}
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() =>
-                      item.quantity === 1
-                        ? removeFromCart(item.id)
-                        : removeFromCart(item.id)
-                    }
+                    onClick={() => decreaseFromCart(item.id)}
                     className="w-8 h-8 border rounded hover:bg-gray-100"
                   >
                     −
