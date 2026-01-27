@@ -1,4 +1,5 @@
 import { getProductById } from "@/services/api";
+import { ProductDetails } from "@/components/ProductDetails";
 
 interface ProductPageProps {
   params: Promise<{
@@ -8,7 +9,6 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
-
   const product = await getProductById(id);
 
   return (
@@ -19,22 +19,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         className="w-full h-80 object-contain"
       />
 
-      <div>
-        <h1 className="text-2xl font-bold mb-4">
-          {product.title}
-        </h1>
-
-        <p className="text-xl font-semibold text-green-600 mb-4">
-          {product.price.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })}
-        </p>
-
-        <p className="text-sm text-gray-600">
-          Categoria: {product.category}
-        </p>
-      </div>
+      <ProductDetails product={product} />
     </main>
   );
 }
