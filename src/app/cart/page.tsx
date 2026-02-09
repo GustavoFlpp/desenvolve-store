@@ -108,6 +108,13 @@ export default function CartPage() {
         </button>
 
         <Link
+          href="/checkout"
+          className="block text-center bg-green-600 text-white py-2 rounded hover:bg-green-700 transition font-semibold mb-4"
+        >
+          Ir para Checkout
+        </Link>
+
+        <Link
           href="/products"
           className="block text-center text-blue-600 hover:underline"
         >
