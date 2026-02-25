@@ -8,6 +8,26 @@ import Link from "next/link";
 import { createPixQrCode, simulatePixPayment } from "@/services/api";
 import { AbacatePayPixQrCodeResponse } from "@/types/payment";
 
+function maskCpf(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  return digits
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+function maskPhone(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 10) {
+    return digits
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{4})(\d)/, "$1-$2");
+  }
+  return digits
+    .replace(/(\d{2})(\d)/, "($1) $2")
+    .replace(/(\d{5})(\d)/, "$1-$2");
+}
+
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
@@ -17,14 +37,15 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState<AbacatePayPixQrCodeResponse | null>(null);
+  const [pixId, setPixId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
 
   // Formulário
   const [formData, setFormData] = useState({
     fullName: user?.username || "",
     email: user?.email || "",
-    phone: "(11) 0000-0000",
-    cpf: "000.000.000-00",
+    phone: "",
+    cpf: "",
   });
 
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -75,6 +96,7 @@ export default function CheckoutPage() {
 
       const response = await createPixQrCode(pixData);
       setQrCode(response);
+      setPixId(response.data?.id || null);
       setOrderId(`order_${Date.now()}`);
       setStep("payment");
     } catch (err) {
@@ -90,7 +112,11 @@ export default function CheckoutPage() {
       setLoading(true);
       setError(null);
 
-      await simulatePixPayment({ orderId });
+      if (!pixId) {
+        throw new Error("ID do QR Code PIX não encontrado");
+      }
+
+      await simulatePixPayment(pixId, { orderId });
 
       // Simular sucesso após 2 segundos
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -140,16 +166,16 @@ export default function CheckoutPage() {
                 />
                 <input
                   type="tel"
-                  placeholder="Telefone"
+                  placeholder="(11) 99999-9999"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, phone: maskPhone(e.target.value) })}
                   className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
                 />
                 <input
                   type="text"
-                  placeholder="CPF"
+                  placeholder="000.000.000-00"
                   value={formData.cpf}
-                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, cpf: maskCpf(e.target.value) })}
                   className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
                 />
               </div>

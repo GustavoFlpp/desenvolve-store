@@ -9,8 +9,6 @@ import {
 } from "@/types/payment";
 
 const BASE_URL = "https://fakestoreapi.com";
-const ABACATE_PAY_URL = "https://api.abacatepay.com/v1";
-const ABACATE_PAY_TOKEN = "abc_dev_XFDA4zxfcyJ0uDSkU4AJdWJR";
 
 export async function getProducts(): Promise<Product[]> {
   const response = await fetch(`${BASE_URL}/products`);
@@ -132,15 +130,14 @@ export async function deleteUser(id: number): Promise<unknown> {
   return response.json();
 }
 
-// ==================== ABACATE PAY - BILLING ====================
+// ==================== ABACATE PAY - BILLING (via API Routes) ====================
 
 export async function createBilling(
   billingData: AbacatePayBillingRequest
 ): Promise<AbacatePayBillingResponse> {
-  const response = await fetch(`${ABACATE_PAY_URL}/billing/create`, {
+  const response = await fetch("/api/billing/create", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${ABACATE_PAY_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(billingData),
@@ -154,11 +151,8 @@ export async function createBilling(
 }
 
 export async function listBillings(): Promise<AbacatePayBillingResponse[]> {
-  const response = await fetch(`${ABACATE_PAY_URL}/billing/list`, {
+  const response = await fetch("/api/billing/list", {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${ABACATE_PAY_TOKEN}`,
-    },
   });
 
   if (!response.ok) {
@@ -169,53 +163,47 @@ export async function listBillings(): Promise<AbacatePayBillingResponse[]> {
   return data.data || [];
 }
 
-// ==================== ABACATE PAY - PIX QRCODE ====================
+// ==================== ABACATE PAY - PIX QRCODE (via API Routes) ====================
 
 export async function createPixQrCode(
   pixData: AbacatePayPixQrCodeRequest
 ): Promise<AbacatePayPixQrCodeResponse> {
-  const response = await fetch(`${ABACATE_PAY_URL}/pixQrCode/create`, {
+  const response = await fetch("/api/pix/create", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${ABACATE_PAY_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(pixData),
   });
 
   if (!response.ok) {
-    throw new Error("Erro ao criar QR Code PIX");
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error || "Erro ao criar QR Code PIX");
   }
 
   return response.json();
 }
 
-export async function simulatePixPayment(metadata: Record<string, unknown> = {}): Promise<AbacatePayPixQrCodeResponse> {
-  const response = await fetch(
-    `${ABACATE_PAY_URL}/pixQrCode/simulate-payment`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${ABACATE_PAY_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ metadata }),
-    }
-  );
+export async function simulatePixPayment(pixId: string, metadata: Record<string, unknown> = {}): Promise<AbacatePayPixQrCodeResponse> {
+  const response = await fetch("/api/pix/simulate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: pixId, metadata }),
+  });
 
   if (!response.ok) {
-    throw new Error("Erro ao simular pagamento PIX");
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error || "Erro ao simular pagamento PIX");
   }
 
   return response.json();
 }
 
 export async function checkPixStatus(): Promise<AbacatePayCheckResponse> {
-  const response = await fetch(`${ABACATE_PAY_URL}/pixQrCode/check`, {
+  const response = await fetch("/api/pix/check", {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${ABACATE_PAY_TOKEN}`,
-    },
   });
 
   if (!response.ok) {

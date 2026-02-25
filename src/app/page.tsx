@@ -2,95 +2,133 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-slate-950 overflow-hidden relative">
+      {/* Ambient glow effects */}
+      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[40%] left-[-10%] w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-[60%] right-[-10%] w-[400px] h-[400px] bg-emerald-500/8 rounded-full blur-[100px] pointer-events-none" />
+
       {/* Hero Section */}
-      <main className="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center">
-        <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20">
-          <span className="text-violet-400 text-sm font-medium">E-commerce Educacional</span>
+      <main className="relative max-w-5xl mx-auto px-6 pt-28 pb-20 text-center">
+        <div className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 backdrop-blur-sm animate-[fadeIn_0.6s_ease-out]">
+          <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+          <span className="text-violet-300 text-sm font-medium tracking-wide">E-commerce Educacional</span>
         </div>
 
-        <h1 className="text-5xl md:text-6xl font-bold mb-6 text-slate-50 leading-tight">
+        <h1 className="text-5xl md:text-7xl font-extrabold mb-8 text-slate-50 leading-[1.1] tracking-tight animate-[fadeIn_0.8s_ease-out]">
           Bem-vindo à{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-violet-600">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-purple-400 to-violet-600 animate-[gradient_3s_ease_infinite] bg-[length:200%_auto]">
             Desenvolve Store
           </span>
         </h1>
 
-        <p className="text-lg text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed animate-[fadeIn_1s_ease-out]">
           Aplicação de e-commerce desenvolvida com Next.js e Tailwind CSS,
           integrando a Fake Store API e pagamentos via AbacatePay.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-24 animate-[fadeIn_1.2s_ease-out]">
           <Link
             href="/products"
-            className="bg-violet-600 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-violet-500 transition text-lg shadow-lg shadow-violet-600/25"
+            className="group relative bg-violet-600 text-white px-10 py-4 rounded-2xl font-semibold hover:bg-violet-500 transition-all text-lg shadow-xl shadow-violet-600/30 hover:shadow-violet-500/40 hover:scale-[1.02] active:scale-[0.98]"
           >
-            Ver Produtos
+            <span className="relative z-10">Ver Produtos</span>
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" />
           </Link>
 
           <a
             href="https://fakestoreapi.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-slate-700 text-slate-300 px-8 py-3.5 rounded-xl font-semibold hover:bg-slate-800 hover:border-slate-600 transition text-lg"
+            className="border border-slate-700 text-slate-300 px-10 py-4 rounded-2xl font-semibold hover:bg-slate-800/80 hover:border-slate-500 transition-all text-lg hover:scale-[1.02] active:scale-[0.98] backdrop-blur-sm"
           >
             Fake Store API
           </a>
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900 rounded-2xl p-8 border border-slate-800 hover:border-violet-500/30 transition group">
-            <div className="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-violet-500/20 transition">
-              <span className="text-2xl">📦</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-100">Catálogo</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Navegue por produtos de várias categorias com filtros e paginação
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+          {[
+            {
+              icon: "📦",
+              title: "Catálogo",
+              desc: "Navegue por produtos de várias categorias com filtros e paginação",
+              accent: "violet",
+            },
+            {
+              icon: "🛒",
+              title: "Carrinho",
+              desc: "Adicione, remova e gerencie produtos com persistência local",
+              accent: "emerald",
+            },
+            {
+              icon: "💳",
+              title: "Pagamento",
+              desc: "Checkout com PIX via integração com AbacatePay",
+              accent: "rose",
+            },
+          ].map((feature, i) => (
+            <div
+              key={feature.title}
+              className="group relative bg-slate-900/80 rounded-2xl p-8 border border-slate-800 hover:border-slate-600 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
+              style={{ animationDelay: `${i * 150}ms` }}
+            >
+              {/* Hover glow */}
+              <div
+                className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
+                  feature.accent === "violet"
+                    ? "bg-violet-500/5"
+                    : feature.accent === "emerald"
+                    ? "bg-emerald-500/5"
+                    : "bg-rose-500/5"
+                }`}
+              />
 
-          <div className="bg-slate-900 rounded-2xl p-8 border border-slate-800 hover:border-violet-500/30 transition group">
-            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-emerald-500/20 transition">
-              <span className="text-2xl">🛒</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-100">Carrinho</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Adicione, remova e gerencie produtos com persistência local
-            </p>
-          </div>
+              <div
+                className={`relative w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-all duration-300 group-hover:scale-110 ${
+                  feature.accent === "violet"
+                    ? "bg-violet-500/10 group-hover:bg-violet-500/20 group-hover:shadow-lg group-hover:shadow-violet-500/20"
+                    : feature.accent === "emerald"
+                    ? "bg-emerald-500/10 group-hover:bg-emerald-500/20 group-hover:shadow-lg group-hover:shadow-emerald-500/20"
+                    : "bg-rose-500/10 group-hover:bg-rose-500/20 group-hover:shadow-lg group-hover:shadow-rose-500/20"
+                }`}
+              >
+                <span className="text-2xl leading-none">{feature.icon}</span>
+              </div>
 
-          <div className="bg-slate-900 rounded-2xl p-8 border border-slate-800 hover:border-violet-500/30 transition group">
-            <div className="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-rose-500/20 transition">
-              <span className="text-2xl">💳</span>
+              <h3 className="relative text-lg font-semibold mb-3 text-slate-100">
+                {feature.title}
+              </h3>
+              <p className="relative text-slate-400 text-sm leading-relaxed">
+                {feature.desc}
+              </p>
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-100">Pagamento</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Checkout com PIX via integração com AbacatePay
-            </p>
-          </div>
+          ))}
         </div>
 
         {/* Tech Stack */}
-        <div className="mt-16 bg-slate-900 rounded-2xl p-8 border border-slate-800">
-          <h3 className="text-xl font-semibold mb-6 text-slate-100">Stack Tecnológico</h3>
+        <div className="relative bg-slate-900/80 rounded-2xl p-10 border border-slate-800 backdrop-blur-sm">
+          <h3 className="text-xl font-semibold mb-8 text-slate-100">Stack Tecnológico</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              "Next.js 16",
-              "React 19",
-              "TypeScript",
-              "Tailwind CSS",
-              "Context API",
-              "localStorage",
-              "Fetch API",
-              "AbacatePay",
+              { name: "Next.js 16", color: "violet" },
+              { name: "React 19", color: "violet" },
+              { name: "TypeScript", color: "violet" },
+              { name: "Tailwind CSS", color: "violet" },
+              { name: "Context API", color: "emerald" },
+              { name: "localStorage", color: "emerald" },
+              { name: "Fetch API", color: "emerald" },
+              { name: "AbacatePay", color: "emerald" },
             ].map((tech) => (
               <div
-                key={tech}
-                className="bg-slate-800 text-slate-300 px-4 py-2.5 rounded-lg font-medium text-sm border border-slate-700 hover:border-violet-500/30 transition"
+                key={tech.name}
+                className={`px-4 py-3 rounded-xl font-medium text-sm border transition-all duration-300 hover:scale-[1.03] cursor-default ${
+                  tech.color === "violet"
+                    ? "bg-violet-500/5 text-violet-300 border-violet-500/15 hover:border-violet-500/40 hover:bg-violet-500/10 hover:shadow-md hover:shadow-violet-500/10"
+                    : "bg-emerald-500/5 text-emerald-300 border-emerald-500/15 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:shadow-md hover:shadow-emerald-500/10"
+                }`}
               >
-                {tech}
+                {tech.name}
               </div>
             ))}
           </div>
