@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createPixQrCode, simulatePixPayment } from "@/services/api";
 import { AbacatePayPixQrCodeResponse } from "@/types/payment";
+import { ShippingOption } from "@/types/address";
+import { fetchAddressByCep, maskCep, calculateShipping } from "@/utils/shipping";
 
 function maskCpf(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -30,7 +32,7 @@ function maskPhone(value: string): string {
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, address } = useAuth();
   const router = useRouter();
 
   const [step, setStep] = useState<"review" | "payment" | "success">("review");
@@ -48,7 +50,69 @@ export default function CheckoutPage() {
     cpf: "",
   });
 
+  // Endereço de entrega
+  const [shippingCep, setShippingCep] = useState("");
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingError, setShippingError] = useState<string | null>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState<string | null>(null);
+
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalWithShipping = total + (selectedShipping?.price || 0);
+
+  // Auto-preencher endereço salvo
+  useEffect(() => {
+    if (address && !shippingCep) {
+      const cep = address.cep.replace(/\D/g, "");
+      setShippingCep(maskCep(cep));
+      setDeliveryAddress(
+        `${address.logradouro}, ${address.numero}${address.complemento ? " - " + address.complemento : ""} — ${address.bairro}, ${address.cidade}/${address.estado}`
+      );
+      const options = calculateShipping(address.estado, total);
+      setShippingOptions(options);
+    }
+  }, [address]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Recalcular frete quando total mudar
+  useEffect(() => {
+    if (shippingOptions.length > 0 && deliveryAddress) {
+      const estado = deliveryAddress.split("/").pop()?.trim() || "";
+      if (estado) {
+        const options = calculateShipping(estado, total);
+        setShippingOptions(options);
+        if (selectedShipping) {
+          const updated = options.find((o) => o.id === selectedShipping.id);
+          setSelectedShipping(updated || null);
+        }
+      }
+    }
+  }, [total]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCalcShipping = async () => {
+    const clean = shippingCep.replace(/\D/g, "");
+    if (clean.length !== 8) {
+      setShippingError("Digite um CEP válido");
+      return;
+    }
+    setShippingLoading(true);
+    setShippingError(null);
+    setShippingOptions([]);
+    setSelectedShipping(null);
+    setDeliveryAddress(null);
+
+    const result = await fetchAddressByCep(clean);
+    if (!result) {
+      setShippingError("CEP não encontrado");
+      setShippingLoading(false);
+      return;
+    }
+
+    setDeliveryAddress(`${result.logradouro} — ${result.bairro}, ${result.cidade}/${result.estado}`);
+    const options = calculateShipping(result.estado, total);
+    setShippingOptions(options);
+    setShippingLoading(false);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -80,7 +144,7 @@ export default function CheckoutPage() {
       setError(null);
 
       const pixData = {
-        amount: Math.round(total * 100), // Converter para centavos
+        amount: Math.round(totalWithShipping * 100), // Converter para centavos
         expiresIn: 3600, // 1 hora
         description: `Pagamento - Desenvolve Store - ${cart.length} item(ns)`,
         customer: {
@@ -146,9 +210,9 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* Dados de Entrega */}
+            {/* Dados pessoais */}
             <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4 text-slate-100">Dados de Entrega</h2>
+              <h2 className="text-xl font-semibold mb-4 text-slate-100">Dados Pessoais</h2>
               <div className="space-y-4">
                 <input
                   type="text"
@@ -179,6 +243,81 @@ export default function CheckoutPage() {
                   className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
                 />
               </div>
+            </section>
+
+            {/* Endereço e frete */}
+            <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4 text-slate-100">Endereço e Frete</h2>
+
+              {deliveryAddress && (
+                <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-3 mb-4">
+                  <p className="text-sm text-slate-300">{deliveryAddress}</p>
+                </div>
+              )}
+
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={shippingCep}
+                  onChange={(e) => setShippingCep(maskCep(e.target.value))}
+                  placeholder="00000-000"
+                  className="flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition text-sm"
+                />
+                <button
+                  onClick={handleCalcShipping}
+                  disabled={shippingLoading}
+                  className="bg-violet-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-violet-500 transition disabled:bg-slate-700 disabled:text-slate-500"
+                >
+                  {shippingLoading ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  ) : (
+                    "Calcular"
+                  )}
+                </button>
+              </div>
+
+              {shippingError && (
+                <p className="text-xs text-rose-400 mb-3">{shippingError}</p>
+              )}
+
+              {shippingOptions.length > 0 && (
+                <div className="space-y-2">
+                  {shippingOptions.map((option) => (
+                    <label
+                      key={option.id}
+                      className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${
+                        selectedShipping?.id === option.id
+                          ? "border-violet-500 bg-violet-500/10"
+                          : "border-slate-700 hover:border-slate-600"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="checkout-shipping"
+                        checked={selectedShipping?.id === option.id}
+                        onChange={() => setSelectedShipping(option)}
+                        className="accent-violet-500"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-slate-200">{option.name}</span>
+                          <span className="text-xs text-slate-500">{option.description}</span>
+                        </div>
+                        <span className="text-xs text-slate-400">
+                          até {option.estimatedDays} dias úteis
+                        </span>
+                      </div>
+                      <span className={`text-sm font-semibold ${option.price === 0 ? "text-emerald-400" : "text-slate-200"}`}>
+                        {option.price === 0 ? "Grátis" : option.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {shippingOptions.length === 0 && !shippingError && !shippingLoading && (
+                <p className="text-sm text-slate-500">Digite o CEP acima para ver as opções de envio.</p>
+              )}
             </section>
 
             {/* Produtos */}
@@ -221,12 +360,26 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between text-slate-300">
                 <span>Frete</span>
-                <span className="text-emerald-400">Grátis</span>
+                {selectedShipping ? (
+                  <span className={selectedShipping.price === 0 ? "text-emerald-400" : ""}>
+                    {selectedShipping.price === 0
+                      ? "Grátis"
+                      : selectedShipping.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </span>
+                ) : (
+                  <span className="text-slate-500 text-sm">--</span>
+                )}
               </div>
+              {selectedShipping && (
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>{selectedShipping.name}</span>
+                  <span>até {selectedShipping.estimatedDays} dias úteis</span>
+                </div>
+              )}
               <div className="flex justify-between text-lg font-semibold text-violet-400">
                 <span>Total</span>
                 <span>
-                  {total.toLocaleString("pt-BR", {
+                  {totalWithShipping.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}

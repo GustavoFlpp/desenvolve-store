@@ -1,15 +1,78 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import { fetchAddressByCep, maskCep, calculateShipping } from "@/utils/shipping";
+import { ShippingOption } from "@/types/address";
 
 export default function CartPage() {
   const { cart, addToCart, decreaseFromCart, removeFromCart, clearCart } = useCart();
+  const { address } = useAuth();
+
+  const [shippingCep, setShippingCep] = useState("");
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingError, setShippingError] = useState<string | null>(null);
+  const [shippingState, setShippingState] = useState<string | null>(null);
 
   const total = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
+
+  const totalWithShipping = total + (selectedShipping?.price || 0);
+
+  // Auto-preencher CEP se o usuário já tiver endereço salvo
+  useEffect(() => {
+    if (address && !shippingCep) {
+      const cep = address.cep.replace(/\D/g, "");
+      setShippingCep(maskCep(cep));
+      setShippingState(address.estado);
+      const options = calculateShipping(address.estado, total);
+      setShippingOptions(options);
+    }
+  }, [address]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Recalcular quando total mudar e já tiver estado
+  useEffect(() => {
+    if (shippingState) {
+      const options = calculateShipping(shippingState, total);
+      setShippingOptions(options);
+      // Manter seleção se ainda existir
+      if (selectedShipping) {
+        const updated = options.find((o) => o.id === selectedShipping.id);
+        setSelectedShipping(updated || null);
+      }
+    }
+  }, [total]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCalculateShipping = async () => {
+    const clean = shippingCep.replace(/\D/g, "");
+    if (clean.length !== 8) {
+      setShippingError("Digite um CEP válido com 8 dígitos");
+      return;
+    }
+
+    setShippingLoading(true);
+    setShippingError(null);
+    setShippingOptions([]);
+    setSelectedShipping(null);
+
+    const result = await fetchAddressByCep(clean);
+    if (!result) {
+      setShippingError("CEP não encontrado");
+      setShippingLoading(false);
+      return;
+    }
+
+    setShippingState(result.estado);
+    const options = calculateShipping(result.estado, total);
+    setShippingOptions(options);
+    setShippingLoading(false);
+  };
 
   if (cart.length === 0) {
     return (
@@ -89,29 +152,128 @@ export default function CartPage() {
       </section>
 
       {/* Resumo */}
-      <aside className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit">
-        <h2 className="text-lg font-semibold mb-4 text-slate-100">Resumo</h2>
+      <aside className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit space-y-5">
+        <h2 className="text-lg font-semibold text-slate-100">Resumo</h2>
 
-        <div className="flex justify-between mb-4 text-slate-300">
-          <span>Total</span>
-          <strong className="text-emerald-400">
-            {total.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </strong>
+        {/* Calcular frete */}
+        <div>
+          <h3 className="text-sm font-medium text-slate-300 mb-2">Calcular frete</h3>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={shippingCep}
+              onChange={(e) => setShippingCep(maskCep(e.target.value))}
+              placeholder="00000-000"
+              className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
+            />
+            <button
+              onClick={handleCalculateShipping}
+              disabled={shippingLoading}
+              className="bg-violet-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-violet-500 transition disabled:bg-slate-700 disabled:text-slate-500"
+            >
+              {shippingLoading ? (
+                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              ) : (
+                "Calcular"
+              )}
+            </button>
+          </div>
+          <a
+            href="https://buscacepinter.correios.com.br/app/endereco/index.php"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-violet-400 hover:text-violet-300 transition mt-1.5 inline-block"
+          >
+            Não sei meu CEP
+          </a>
+
+          {shippingError && (
+            <p className="text-xs text-rose-400 mt-2">{shippingError}</p>
+          )}
+
+          {/* Opções de frete */}
+          {shippingOptions.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {shippingOptions.map((option) => (
+                <label
+                  key={option.id}
+                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${
+                    selectedShipping?.id === option.id
+                      ? "border-violet-500 bg-violet-500/10"
+                      : "border-slate-700 hover:border-slate-600"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="shipping"
+                    checked={selectedShipping?.id === option.id}
+                    onChange={() => setSelectedShipping(option)}
+                    className="accent-violet-500"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-slate-200">{option.name}</span>
+                      <span className="text-xs text-slate-500">{option.description}</span>
+                    </div>
+                    <span className="text-xs text-slate-400">
+                      até {option.estimatedDays} dias úteis
+                    </span>
+                  </div>
+                  <span className={`text-sm font-semibold ${option.price === 0 ? "text-emerald-400" : "text-slate-200"}`}>
+                    {option.price === 0 ? "Grátis" : option.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Valores */}
+        <div className="border-t border-slate-800 pt-4 space-y-3">
+          <div className="flex justify-between text-sm text-slate-400">
+            <span>Subtotal</span>
+            <span>
+              {total.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </span>
+          </div>
+
+          <div className="flex justify-between text-sm text-slate-400">
+            <span>Frete</span>
+            {selectedShipping ? (
+              <span className={selectedShipping.price === 0 ? "text-emerald-400" : ""}>
+                {selectedShipping.price === 0
+                  ? "Grátis"
+                  : selectedShipping.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </span>
+            ) : (
+              <span className="text-slate-500 text-xs">Calcule acima</span>
+            )}
+          </div>
+
+          <div className="flex justify-between text-lg font-bold pt-2 border-t border-slate-800">
+            <span className="text-slate-100">Total</span>
+            <span className="text-emerald-400">
+              {totalWithShipping.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </span>
+          </div>
         </div>
 
         <button
           onClick={clearCart}
-          className="w-full border border-rose-500/30 text-rose-400 py-2.5 rounded-xl hover:bg-rose-500/10 transition mb-3 font-medium"
+          className="w-full border border-rose-500/30 text-rose-400 py-2.5 rounded-xl hover:bg-rose-500/10 transition font-medium"
         >
           Limpar carrinho
         </button>
 
         <Link
           href="/checkout"
-          className="block text-center bg-violet-600 text-white py-2.5 rounded-xl hover:bg-violet-500 transition font-semibold mb-3"
+          className="block text-center bg-violet-600 text-white py-2.5 rounded-xl hover:bg-violet-500 transition font-semibold"
         >
           Ir para Checkout
         </Link>

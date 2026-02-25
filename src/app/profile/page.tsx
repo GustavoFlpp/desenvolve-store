@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { Address } from "@/types/address";
+import { fetchAddressByCep, maskCep } from "@/utils/shipping";
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, updateUser, updateAvatar, avatar, logout } = useAuth();
+  const { user, isAuthenticated, updateUser, updateAvatar, avatar, logout, address, updateAddress, clearAddress } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -21,6 +23,17 @@ export default function ProfilePage() {
   });
   const [editingInfo, setEditingInfo] = useState(false);
   const [editingPassword, setEditingPassword] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(false);
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [addressForm, setAddressForm] = useState<Address>({
+    cep: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+  });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +48,10 @@ export default function ProfilePage() {
         email: user.email,
       });
     }
-  }, [isAuthenticated, user, router]);
+    if (address) {
+      setAddressForm(address);
+    }
+  }, [isAuthenticated, user, router, address]);
 
   const handleInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -97,6 +113,87 @@ export default function ProfilePage() {
       logout();
       router.push("/");
     }
+  };
+
+  const handleCepChange = async (value: string) => {
+    const masked = maskCep(value);
+    setAddressForm((prev) => ({ ...prev, cep: masked }));
+
+    const clean = masked.replace(/\D/g, "");
+    if (clean.length === 8) {
+      setAddressLoading(true);
+      setError(null);
+      const result = await fetchAddressByCep(clean);
+      if (result) {
+        setAddressForm((prev) => ({
+          ...prev,
+          cep: result.cep,
+          logradouro: result.logradouro,
+          bairro: result.bairro,
+          cidade: result.cidade,
+          estado: result.estado,
+          complemento: result.complemento || prev.complemento,
+        }));
+      } else {
+        setError("CEP não encontrado. Verifique e tente novamente.");
+      }
+      setAddressLoading(false);
+    }
+  };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setAddressForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveAddress = () => {
+    setError(null);
+
+    if (!addressForm.cep || addressForm.cep.replace(/\D/g, "").length !== 8) {
+      setError("CEP válido é obrigatório");
+      return;
+    }
+    if (!addressForm.logradouro.trim()) {
+      setError("Logradouro é obrigatório");
+      return;
+    }
+    if (!addressForm.numero.trim()) {
+      setError("Número é obrigatório");
+      return;
+    }
+    if (!addressForm.bairro.trim()) {
+      setError("Bairro é obrigatório");
+      return;
+    }
+    if (!addressForm.cidade.trim()) {
+      setError("Cidade é obrigatória");
+      return;
+    }
+    if (!addressForm.estado.trim()) {
+      setError("Estado é obrigatório");
+      return;
+    }
+
+    updateAddress(addressForm);
+    setEditingAddress(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleRemoveAddress = () => {
+    clearAddress();
+    setAddressForm({
+      cep: "",
+      logradouro: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      estado: "",
+    });
+    setEditingAddress(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -345,6 +442,157 @@ export default function ProfilePage() {
             </div>
           ) : (
             <p className="text-sm text-slate-500">••••••••</p>
+          )}
+        </div>
+
+        {/* Address section */}
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 mb-6 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-base font-semibold text-slate-200">Endereço de entrega</h3>
+            {!editingAddress && (
+              <button
+                onClick={() => { setEditingAddress(true); setError(null); }}
+                className="text-sm text-violet-400 hover:text-violet-300 transition font-medium"
+              >
+                {address ? "Editar" : "Adicionar"}
+              </button>
+            )}
+          </div>
+
+          {editingAddress ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1.5">CEP</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="cep"
+                    value={addressForm.cep}
+                    onChange={(e) => handleCepChange(e.target.value)}
+                    placeholder="00000-000"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition placeholder-slate-600"
+                  />
+                  {addressLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="animate-spin h-4 w-4 border-2 border-violet-500 border-t-transparent rounded-full" />
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-1">Digite o CEP para preencher automaticamente</p>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2">
+                  <label className="block text-sm text-slate-400 mb-1.5">Logradouro</label>
+                  <input
+                    type="text"
+                    name="logradouro"
+                    value={addressForm.logradouro}
+                    onChange={handleAddressChange}
+                    placeholder="Rua, Avenida..."
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition placeholder-slate-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1.5">Número</label>
+                  <input
+                    type="text"
+                    name="numero"
+                    value={addressForm.numero}
+                    onChange={handleAddressChange}
+                    placeholder="123"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition placeholder-slate-600"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-1.5">Complemento</label>
+                <input
+                  type="text"
+                  name="complemento"
+                  value={addressForm.complemento}
+                  onChange={handleAddressChange}
+                  placeholder="Apto, bloco, sala... (opcional)"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition placeholder-slate-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-1.5">Bairro</label>
+                <input
+                  type="text"
+                  name="bairro"
+                  value={addressForm.bairro}
+                  onChange={handleAddressChange}
+                  placeholder="Bairro"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition placeholder-slate-600"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2">
+                  <label className="block text-sm text-slate-400 mb-1.5">Cidade</label>
+                  <input
+                    type="text"
+                    name="cidade"
+                    value={addressForm.cidade}
+                    onChange={handleAddressChange}
+                    placeholder="Cidade"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition placeholder-slate-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1.5">Estado</label>
+                  <input
+                    type="text"
+                    name="estado"
+                    value={addressForm.estado}
+                    onChange={handleAddressChange}
+                    placeholder="UF"
+                    maxLength={2}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition placeholder-slate-600 uppercase"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleSaveAddress}
+                  className="bg-violet-600 text-white px-5 py-2.5 rounded-xl hover:bg-violet-500 transition text-sm font-semibold shadow-lg shadow-violet-600/20"
+                >
+                  Salvar endereço
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingAddress(false);
+                    setError(null);
+                    if (address) setAddressForm(address);
+                  }}
+                  className="border border-slate-700 text-slate-300 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium"
+                >
+                  Cancelar
+                </button>
+                {address && (
+                  <button
+                    onClick={handleRemoveAddress}
+                    className="border border-rose-500/30 text-rose-400 px-5 py-2.5 rounded-xl hover:bg-rose-500/10 transition text-sm font-medium ml-auto"
+                  >
+                    Remover
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : address ? (
+            <div className="space-y-2">
+              <p className="text-sm text-slate-200">
+                {address.logradouro}, {address.numero}
+                {address.complemento ? ` - ${address.complemento}` : ""}
+              </p>
+              <p className="text-sm text-slate-400">
+                {address.bairro} — {address.cidade}/{address.estado}
+              </p>
+              <p className="text-sm text-slate-500">CEP: {address.cep}</p>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-500">
+              Nenhum endereço cadastrado. Adicione um endereço para calcular frete.
+            </p>
           )}
         </div>
 

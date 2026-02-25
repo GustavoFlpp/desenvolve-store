@@ -2,12 +2,14 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { User, LoginCredentials, AuthResponse } from "@/types/auth";
+import { Address } from "@/types/address";
 import { login } from "@/services/api";
 
 interface AuthContextData {
   user: User | null;
   token: string | null;
   avatar: string | null;
+  address: Address | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -15,6 +17,8 @@ interface AuthContextData {
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
   updateAvatar: (base64: string) => void;
+  updateAddress: (address: Address) => void;
+  clearAddress: () => void;
 }
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
@@ -22,11 +26,13 @@ const AuthContext = createContext<AuthContextData | undefined>(undefined);
 const AUTH_STORAGE_KEY = "desenvolve-store-auth";
 const TOKEN_STORAGE_KEY = "desenvolve-store-token";
 const AVATAR_STORAGE_KEY = "desenvolve-store-avatar";
+const ADDRESS_STORAGE_KEY = "desenvolve-store-address";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [address, setAddress] = useState<Address | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -48,6 +54,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const savedAvatar = localStorage.getItem(AVATAR_STORAGE_KEY);
     if (savedAvatar) setAvatar(savedAvatar);
+    const savedAddress = localStorage.getItem(ADDRESS_STORAGE_KEY);
+    if (savedAddress) {
+      try {
+        setAddress(JSON.parse(savedAddress));
+      } catch (err) {
+        console.error("Erro ao carregar endereço:", err);
+        localStorage.removeItem(ADDRESS_STORAGE_KEY);
+      }
+    }
     setIsMounted(true);
   }, []);
 
@@ -83,10 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setToken(null);
     setAvatar(null);
+    setAddress(null);
     setError(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     localStorage.removeItem(AVATAR_STORAGE_KEY);
+    localStorage.removeItem(ADDRESS_STORAGE_KEY);
   };
 
   const updateUser = (data: Partial<User>) => {
@@ -101,12 +118,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(AVATAR_STORAGE_KEY, base64);
   };
 
+  const updateAddress = (addr: Address) => {
+    setAddress(addr);
+    localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(addr));
+  };
+
+  const clearAddress = () => {
+    setAddress(null);
+    localStorage.removeItem(ADDRESS_STORAGE_KEY);
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         token,
         avatar,
+        address,
         isAuthenticated: !!token && !!user,
         isLoading,
         error,
@@ -114,6 +142,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         updateUser,
         updateAvatar,
+        updateAddress,
+        clearAddress,
       }}
     >
       {children}
