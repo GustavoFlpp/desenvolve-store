@@ -7,21 +7,26 @@ import { login } from "@/services/api";
 interface AuthContextData {
   user: User | null;
   token: string | null;
+  avatar: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
   loginUser: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
+  updateUser: (data: Partial<User>) => void;
+  updateAvatar: (base64: string) => void;
 }
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = "desenvolve-store-auth";
 const TOKEN_STORAGE_KEY = "desenvolve-store-token";
+const AVATAR_STORAGE_KEY = "desenvolve-store-avatar";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -41,6 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(TOKEN_STORAGE_KEY);
       }
     }
+    const savedAvatar = localStorage.getItem(AVATAR_STORAGE_KEY);
+    if (savedAvatar) setAvatar(savedAvatar);
     setIsMounted(true);
   }, []);
 
@@ -75,9 +82,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setAvatar(null);
     setError(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
     localStorage.removeItem(TOKEN_STORAGE_KEY);
+    localStorage.removeItem(AVATAR_STORAGE_KEY);
+  };
+
+  const updateUser = (data: Partial<User>) => {
+    if (!user) return;
+    const updatedUser = { ...user, ...data };
+    setUser(updatedUser);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
+  };
+
+  const updateAvatar = (base64: string) => {
+    setAvatar(base64);
+    localStorage.setItem(AVATAR_STORAGE_KEY, base64);
   };
 
   return (
@@ -85,11 +106,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         token,
+        avatar,
         isAuthenticated: !!token && !!user,
         isLoading,
         error,
         loginUser,
         logout,
+        updateUser,
+        updateAvatar,
       }}
     >
       {children}

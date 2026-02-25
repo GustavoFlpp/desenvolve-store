@@ -56,32 +56,61 @@ Desenvolve Store é um portal de compras que demonstra habilidades em:
 - [x] Tratamento de erros em requisições
 - [x] Componentes TypeScript bem tipados
 
+### Extras Educacionais (Opcional) ✨
+> As funcionalidades abaixo **não fazem parte dos requisitos obrigatórios** do desafio.
+> Foram implementadas como aprendizado adicional e exploração de conceitos reais de mercado.
+
+- [x] **Autenticação** — Login e cadastro com Fake Store API, Context API + localStorage
+- [x] **Perfil do usuário** — Edição de dados, upload de foto de perfil, alteração de senha
+- [x] **Pagamento PIX (AbacatePay)** — Checkout com geração de QR Code PIX em tempo real
+- [x] **API Routes (proxy)** — Rotas server-side no Next.js para evitar exposição de chaves
+- [x] **Traduções pt-BR** — Títulos, descrições e categorias dos produtos traduzidos
+- [x] **Design system** — Dark theme coeso (slate + violet), animações, glassmorphism, glow effects
+
 ## 📂 Estrutura do Projeto
 
 ```
 src/
 ├── app/                      # Páginas (Next.js App Router)
-│   ├── layout.tsx           # Layout raiz com CartProvider
+│   ├── layout.tsx           # Layout raiz com Providers
 │   ├── page.tsx             # Home
 │   ├── products/            # Lista de produtos
 │   │   └── page.tsx
 │   ├── product/
 │   │   └── [id]/            # Detalhes do produto
 │   │       └── page.tsx
-│   └── cart/                # Carrinho
-│       └── page.tsx
+│   ├── cart/                # Carrinho
+│   │   └── page.tsx
+│   ├── login/               # Login (extra)
+│   │   └── page.tsx
+│   ├── signup/              # Cadastro (extra)
+│   │   └── page.tsx
+│   ├── profile/             # Perfil do usuário (extra)
+│   │   └── page.tsx
+│   ├── checkout/            # Checkout com PIX (extra)
+│   │   └── page.tsx
+│   └── api/                 # API Routes - proxy server-side (extra)
+│       ├── pix/
+│       └── billing/
 ├── components/              # Componentes reutilizáveis
-│   ├── Header.tsx          # Navegação e contador do carrinho
-│   ├── ProductCard.tsx     # Card do produto
+│   ├── Header.tsx          # Navegação, avatar e contador do carrinho
+│   ├── ProductCard.tsx     # Card do produto com quantidade
 │   ├── CategoryFilter.tsx  # Filtro de categorias
-│   └── ProductDetails.tsx  # Detalhes do produto
+│   ├── ProductDetails.tsx  # Detalhes do produto
+│   ├── ErrorMessage.tsx    # Mensagem de erro
+│   └── Pagination.tsx      # Paginação
 ├── context/                # Estado global
-│   └── CartContext.tsx     # Context API do carrinho
+│   ├── CartContext.tsx     # Context API do carrinho
+│   └── AuthContext.tsx     # Context API de autenticação (extra)
 ├── services/               # Serviços de API
 │   └── api.ts             # Fetch das endpoints
+├── utils/                  # Utilidades
+│   └── translations.ts    # Traduções pt-BR dos produtos
 └── types/                  # Tipos TypeScript
     ├── product.ts
-    └── cart.ts
+    ├── cart.ts
+    ├── auth.ts
+    └── payment.ts
 ```
 
 ## 🔧 Como Executar
@@ -126,15 +155,22 @@ http://localhost:3000
 | `/products` | Lista de produtos com filtro por categoria |
 | `/product/:id` | Detalhes de um produto específico |
 | `/cart` | Carrinho de compras com CRUD |
+| `/login` | Login de usuário *(extra)* |
+| `/signup` | Cadastro de usuário *(extra)* |
+| `/profile` | Perfil com edição de dados e upload de foto *(extra)* |
+| `/checkout` | Checkout com pagamento PIX *(extra)* |
 
 ## 🎨 Features de UX
 
 - **Loading States**: Skeletons animados enquanto dados carregam
 - **Responsividade**: Design adaptado para mobile, tablet e desktop
 - **Filtro por Categorias**: Dinamicamente carregadas da API
-- **Persistência**: Carrinho salvo em localStorage
-- **Feedback**: Mensagens de erro claras ao usuário
+- **Persistência**: Carrinho e autenticação salvos em localStorage
+- **Feedback**: Mensagens de erro claras, toast de confirmação
 - **Formatação**: Preços em BRL (Real Brasileiro)
+- **Traduções**: Produtos traduzidos para português brasileiro
+- **Dark Theme**: Design coeso com paleta slate + violet + emerald
+- **Animações**: fadeIn, gradient, hover effects, glassmorphism
 
 ## 🔌 Endpoints da Fake Store API Utilizados
 
@@ -147,6 +183,28 @@ GET /products/category/:cat // Produtos de uma categoria
 ```
 
 📖 Documentação: https://fakestoreapi.com
+
+## 🥑 AbacatePay (Extra Educacional)
+
+> **Esta integração é opcional e puramente educacional.** Não faz parte dos requisitos do desafio.
+
+Implementamos um fluxo completo de pagamento PIX usando a API da [AbacatePay](https://abacatepay.com):
+
+1. **Checkout** — Cliente revisa itens, informa CPF e telefone
+2. **QR Code PIX** — Gerado em tempo real via API da AbacatePay
+3. **Confirmação** — Pagamento verificado automaticamente
+
+A integração utiliza **API Routes do Next.js** como proxy server-side para não expor chaves no client.
+
+```
+POST /api/pix/create      → Gera QR Code PIX
+POST /api/pix/simulate     → Simula pagamento (sandbox)
+GET  /api/pix/check        → Verifica status
+POST /api/billing/create   → Cria cobrança
+GET  /api/billing/list     → Lista cobranças
+```
+
+📖 Documentação: https://abacatepay.com
 
 ## 💾 Persistência
 
@@ -202,4 +260,4 @@ Este projeto é de código aberto para fins educacionais.
 
 **Status**: ✅ Completo - Pronto para produção
 
-**Última atualização**: Janeiro de 2026
+**Última atualização**: Fevereiro de 2026

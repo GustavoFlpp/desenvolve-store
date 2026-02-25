@@ -107,7 +107,7 @@ export default function Home() {
         </div>
 
         {/* Tech Stack */}
-        <div className="relative bg-slate-900/80 rounded-2xl p-10 border border-slate-800 backdrop-blur-sm">
+        <div className="relative bg-slate-900/80 rounded-2xl p-10 border border-slate-800 backdrop-blur-sm mb-20">
           <h3 className="text-xl font-semibold mb-8 text-slate-100">Stack Tecnológico</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
@@ -131,6 +131,65 @@ export default function Home() {
                 {tech.name}
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* AbacatePay Section */}
+        <div className="relative bg-slate-900/80 rounded-2xl p-10 border border-emerald-500/10 backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-2xl">🥑</span>
+            <h3 className="text-xl font-semibold text-slate-100">AbacatePay</h3>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold uppercase tracking-wider">
+              Extra
+            </span>
+          </div>
+
+          <p className="text-sm text-slate-400 leading-relaxed mb-6 max-w-2xl">
+            Como funcionalidade <span className="text-slate-300 font-medium">extra e puramente educacional</span>,
+            integramos a API de pagamentos da AbacatePay para simular um fluxo real de checkout com PIX.
+            Esta funcionalidade <span className="text-slate-300 font-medium">não faz parte dos requisitos obrigatórios</span> do
+            desafio de 4 sprints — foi implementada como aprendizado adicional.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {[
+              {
+                step: "1",
+                title: "Checkout",
+                desc: "O cliente revisa os itens do carrinho e informa CPF e telefone",
+              },
+              {
+                step: "2",
+                title: "QR Code PIX",
+                desc: "Um QR Code é gerado em tempo real via API da AbacatePay",
+              },
+              {
+                step: "3",
+                title: "Confirmação",
+                desc: "O pagamento é verificado automaticamente e o pedido confirmado",
+              },
+            ].map((item) => (
+              <div key={item.step} className="bg-slate-800/40 rounded-xl p-4 border border-slate-800">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400 mb-3">
+                  {item.step}
+                </div>
+                <h4 className="text-sm font-semibold text-slate-200 mb-1">{item.title}</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <a
+              href="https://abacatepay.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-emerald-400 hover:text-emerald-300 transition font-medium"
+            >
+              abacatepay.com →
+            </a>
+            <span className="text-xs text-slate-600">|</span>
+            <span className="text-xs text-slate-600">Integração via API Routes (server-side proxy)</span>
           </div>
         </div>
       </main>

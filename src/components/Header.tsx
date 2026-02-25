@@ -7,7 +7,7 @@ import { CartItem } from "@/types/cart";
 
 export function Header() {
   const { cart } = useCart();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, avatar, logout } = useAuth();
 
   const totalItems = cart.reduce(
     (acc: number, item: CartItem) => acc + item.quantity,
@@ -37,9 +37,25 @@ export function Header() {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-3 pl-6 border-l border-slate-700">
-              <span className="text-sm text-slate-400">
-                {user?.username}
-              </span>
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 hover:opacity-80 transition"
+              >
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt="Avatar"
+                    className="w-7 h-7 rounded-full object-cover border border-violet-500/30"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-400">
+                    {user?.username?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-sm text-slate-400 hover:text-violet-400 transition">
+                  {user?.username}
+                </span>
+              </Link>
               <button
                 onClick={logout}
                 className="text-sm text-rose-400 hover:text-rose-300 transition font-medium"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getCategories } from "@/services/api";
+import { getTranslatedCategory } from "@/utils/translations";
 
 interface CategoryFilterProps {
   onCategoryChange: (category: string | null) => void;
@@ -47,7 +48,7 @@ export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
 
       <button
         onClick={() => handleCategoryClick(null)}
-        className={`block w-full text-left px-4 py-2.5 rounded-xl transition font-medium text-sm ${
+        className={`block w-full text-left px-4 py-2.5 rounded-xl transition font-medium text-sm cursor-pointer ${
           selectedCategory === null
             ? "bg-violet-600 text-white"
             : "bg-slate-900 border border-slate-800 text-slate-300 hover:border-violet-500/30"
@@ -60,13 +61,13 @@ export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
         <button
           key={category}
           onClick={() => handleCategoryClick(category)}
-          className={`block w-full text-left px-4 py-2.5 rounded-xl capitalize transition font-medium text-sm ${
+          className={`block w-full text-left px-4 py-2.5 rounded-xl transition font-medium text-sm cursor-pointer ${
             selectedCategory === category
               ? "bg-violet-600 text-white"
               : "bg-slate-900 border border-slate-800 text-slate-300 hover:border-violet-500/30"
           }`}
         >
-          {category}
+          {getTranslatedCategory(category)}
         </button>
       ))}
     </div>
