@@ -28,12 +28,14 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-100`}
       >
         <AuthProvider>
           <CartProvider>
             <Header />
-            {children}
+            <div className="min-h-[calc(100vh-73px)]">
+              {children}
+            </div>
           </CartProvider>
         </AuthProvider>
       </body>

@@ -17,25 +17,25 @@ export function ProductCard({ product }: ProductCardProps) {
   }).format(product.price);
 
   return (
-    <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-      <div className="aspect-square overflow-hidden rounded mb-4 bg-gray-100 flex items-center justify-center h-48">
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 hover:border-violet-500/30 transition-all group">
+      <div className="aspect-square overflow-hidden rounded-xl mb-4 bg-slate-800 flex items-center justify-center h-48">
         <img
           src={product.image}
           alt={product.title}
-          className="w-full h-full object-contain p-4"
+          className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 
-      <h2 className="font-semibold text-sm line-clamp-2 mb-2">
+      <h2 className="font-semibold text-sm line-clamp-2 mb-2 text-slate-100">
         {product.title}
       </h2>
 
-      <p className="text-xs text-gray-500 mb-3 capitalize">
+      <p className="text-xs text-slate-500 mb-3 capitalize">
         {product.category}
       </p>
 
       <div className="flex items-center justify-between mb-4">
-        <span className="text-lg font-bold text-green-600">
+        <span className="text-lg font-bold text-emerald-400">
           {formattedPrice}
         </span>
       </div>
@@ -43,14 +43,14 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="flex gap-2">
         <Link
           href={`/product/${product.id}`}
-          className="flex-1 text-center bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition text-sm font-medium"
+          className="flex-1 text-center border border-slate-700 text-slate-300 py-2 rounded-lg hover:bg-slate-800 hover:border-violet-500/30 transition text-sm font-medium"
         >
           Detalhes
         </Link>
 
         <button
           onClick={() => addToCart(product)}
-          className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition text-sm font-medium"
+          className="flex-1 bg-violet-600 text-white py-2 rounded-lg hover:bg-violet-500 transition text-sm font-medium"
         >
           Adicionar
         </button>

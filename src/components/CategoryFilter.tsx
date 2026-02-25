@@ -35,22 +35,22 @@ export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
   if (loading) {
     return (
       <div className="animate-pulse space-y-2">
-        <div className="h-8 bg-gray-200 rounded w-32"></div>
-        <div className="h-8 bg-gray-200 rounded w-32"></div>
+        <div className="h-8 bg-slate-800 rounded-lg w-32"></div>
+        <div className="h-8 bg-slate-800 rounded-lg w-32"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <h3 className="font-semibold text-lg">Categorias</h3>
+    <div className="space-y-2">
+      <h3 className="font-semibold text-lg text-slate-100 mb-3">Categorias</h3>
 
       <button
         onClick={() => handleCategoryClick(null)}
-        className={`block w-full text-left px-4 py-2 rounded transition ${
+        className={`block w-full text-left px-4 py-2.5 rounded-xl transition font-medium text-sm ${
           selectedCategory === null
-            ? "bg-blue-600 text-white"
-            : "bg-gray-100 hover:bg-gray-200"
+            ? "bg-violet-600 text-white"
+            : "bg-slate-900 border border-slate-800 text-slate-300 hover:border-violet-500/30"
         }`}
       >
         Todos os Produtos
@@ -60,10 +60,10 @@ export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
         <button
           key={category}
           onClick={() => handleCategoryClick(category)}
-          className={`block w-full text-left px-4 py-2 rounded capitalize transition ${
+          className={`block w-full text-left px-4 py-2.5 rounded-xl capitalize transition font-medium text-sm ${
             selectedCategory === category
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 hover:bg-gray-200"
+              ? "bg-violet-600 text-white"
+              : "bg-slate-900 border border-slate-800 text-slate-300 hover:border-violet-500/30"
           }`}
         >
           {category}

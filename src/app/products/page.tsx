@@ -51,7 +51,7 @@ export default function ProductsPage() {
 
   return (
     <main className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Loja</h1>
+      <h1 className="text-3xl font-bold mb-8 text-slate-50">Loja</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <aside className="md:col-span-1">
@@ -64,16 +64,16 @@ export default function ProductsPage() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="border rounded-lg p-4 animate-pulse">
-                  <div className="aspect-square bg-gray-200 rounded mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4 w-2/3"></div>
-                  <div className="h-8 bg-gray-200 rounded"></div>
+                <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 animate-pulse">
+                  <div className="aspect-square bg-slate-800 rounded-xl mb-4"></div>
+                  <div className="h-4 bg-slate-800 rounded mb-2"></div>
+                  <div className="h-4 bg-slate-800 rounded mb-4 w-2/3"></div>
+                  <div className="h-10 bg-slate-800 rounded-lg"></div>
                 </div>
               ))}
             </div>
           ) : currentProducts.length === 0 ? (
-            <div className="text-center text-gray-600 py-12">
+            <div className="text-center text-slate-400 py-12">
               <p className="text-lg">Nenhum produto encontrado.</p>
             </div>
           ) : (

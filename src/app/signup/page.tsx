@@ -88,34 +88,34 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md text-center">
           <div className="text-5xl mb-4">✅</div>
-          <h1 className="text-2xl font-bold mb-2">Conta Criada!</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-2xl font-bold mb-2 text-slate-50">Conta Criada!</h1>
+          <p className="text-slate-400 mb-6">
             Sua conta foi criada com sucesso. Você será redirecionado em breve...
           </p>
-          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+          <div className="animate-spin h-8 w-8 border-4 border-violet-500 border-t-transparent rounded-full mx-auto"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-2">Criar Conta</h1>
-        <p className="text-gray-600 text-center mb-8">Junte-se ao Desenvolve Store</p>
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-2 text-slate-50">Criar Conta</h1>
+        <p className="text-slate-400 text-center mb-8">Junte-se ao Desenvolve Store</p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl mb-6 text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-2">
               Usuário
             </label>
             <input
@@ -125,14 +125,14 @@ export default function SignupPage() {
               value={formData.username}
               onChange={handleChange}
               placeholder="Escolha um nome de usuário"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
               required
               disabled={isLoading}
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
               E-mail
             </label>
             <input
@@ -142,14 +142,14 @@ export default function SignupPage() {
               value={formData.email}
               onChange={handleChange}
               placeholder="seu@email.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
               required
               disabled={isLoading}
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
               Senha
             </label>
             <input
@@ -159,7 +159,7 @@ export default function SignupPage() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Mínimo 6 caracteres"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
               required
               disabled={isLoading}
             />
@@ -168,7 +168,7 @@ export default function SignupPage() {
           <div>
             <label
               htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-slate-300 mb-2"
             >
               Confirmar Senha
             </label>
@@ -179,7 +179,7 @@ export default function SignupPage() {
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="Confirme sua senha"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
               required
               disabled={isLoading}
             />
@@ -188,20 +188,20 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400"
+            className="w-full bg-violet-600 text-white py-2.5 rounded-xl font-semibold hover:bg-violet-500 transition disabled:bg-slate-700 disabled:text-slate-500"
           >
             {isLoading ? "Criando conta..." : "Criar Conta"}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600 mb-3">
+          <p className="text-slate-400 mb-3">
             Já tem uma conta?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline font-semibold">
+            <Link href="/login" className="text-violet-400 hover:text-violet-300 font-semibold transition">
               Fazer Login
             </Link>
           </p>
-          <Link href="/products" className="text-gray-600 hover:underline">
+          <Link href="/products" className="text-slate-500 hover:text-slate-300 transition">
             ← Voltar para produtos
           </Link>
         </div>

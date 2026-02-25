@@ -24,7 +24,7 @@ export function Pagination({
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="px-3 py-2 border rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="px-3 py-2 border border-slate-700 rounded-xl hover:bg-slate-800 text-slate-300 transition disabled:opacity-30 disabled:cursor-not-allowed font-medium text-sm"
         >
           ← Anterior
         </button>
@@ -32,7 +32,6 @@ export function Pagination({
         <div className="flex gap-1">
           {Array.from({ length: totalPages }).map((_, i) => {
             const pageNumber = i + 1;
-            // Mostrar primeiras 3 páginas, páginas próximas à atual, e última página
             const showPage =
               pageNumber <= 3 ||
               pageNumber === totalPages ||
@@ -44,7 +43,7 @@ export function Pagination({
                 (i === totalPages - 2 && currentPage < totalPages - 3)
               ) {
                 return (
-                  <span key={i} className="px-2 py-2 text-gray-400">
+                  <span key={i} className="px-2 py-2 text-slate-600">
                     ...
                   </span>
                 );
@@ -56,10 +55,10 @@ export function Pagination({
               <button
                 key={pageNumber}
                 onClick={() => onPageChange(pageNumber)}
-                className={`px-3 py-2 rounded-lg transition font-medium ${
+                className={`px-3 py-2 rounded-xl transition font-medium text-sm ${
                   currentPage === pageNumber
-                    ? "bg-blue-600 text-white"
-                    : "border hover:bg-gray-100"
+                    ? "bg-violet-600 text-white"
+                    : "border border-slate-700 text-slate-300 hover:bg-slate-800"
                 }`}
               >
                 {pageNumber}
@@ -71,14 +70,14 @@ export function Pagination({
         <button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="px-3 py-2 border rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="px-3 py-2 border border-slate-700 rounded-xl hover:bg-slate-800 text-slate-300 transition disabled:opacity-30 disabled:cursor-not-allowed font-medium text-sm"
         >
           Próximo →
         </button>
       </div>
 
       {/* Info de paginação */}
-      <div className="text-center text-sm text-gray-600">
+      <div className="text-center text-sm text-slate-500">
         <p>
           Mostrando <strong>{startIndex + 1}</strong>-
           <strong>{Math.min(endIndex, total)}</strong> de <strong>{total}</strong> produtos •
