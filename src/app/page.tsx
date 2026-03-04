@@ -24,7 +24,8 @@ export default function Home() {
 
         <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed animate-[fadeIn_1s_ease-out]">
           Aplicação de e-commerce desenvolvida com Next.js e Tailwind CSS,
-          integrando a Fake Store API e pagamentos via AbacatePay.
+          integrando a Fake Store API e pagamentos via AbacatePay{" "}
+          <span className="text-slate-500 text-base">(extra educacional, não obrigatório)</span>.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-24 animate-[fadeIn_1.2s_ease-out]">
@@ -64,7 +65,7 @@ export default function Home() {
             {
               icon: "💳",
               title: "Pagamento",
-              desc: "Checkout com PIX via integração com AbacatePay",
+              desc: "Checkout com PIX via integração com AbacatePay (extra educacional)",
               accent: "rose",
             },
           ].map((feature, i) => (
@@ -118,7 +119,7 @@ export default function Home() {
               { name: "Context API", color: "emerald" },
               { name: "localStorage", color: "emerald" },
               { name: "Fetch API", color: "emerald" },
-              { name: "AbacatePay", color: "emerald" },
+              { name: "AbacatePay (extra)", color: "emerald" },
             ].map((tech) => (
               <div
                 key={tech.name}
@@ -136,7 +137,7 @@ export default function Home() {
 
         {/* AbacatePay Section */}
         <div className="relative bg-slate-900/80 rounded-2xl p-10 border border-emerald-500/10 backdrop-blur-sm">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-2xl">🥑</span>
             <h3 className="text-xl font-semibold text-slate-100">AbacatePay</h3>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold uppercase tracking-wider">
@@ -144,14 +145,14 @@ export default function Home() {
             </span>
           </div>
 
-          <p className="text-sm text-slate-400 leading-relaxed mb-6 max-w-2xl">
+          <p className="text-sm text-slate-400 leading-relaxed mb-8 max-w-2xl mx-auto text-center">
             Como funcionalidade <span className="text-slate-300 font-medium">extra e puramente educacional</span>,
             integramos a API de pagamentos da AbacatePay para simular um fluxo real de checkout com PIX.
             Esta funcionalidade <span className="text-slate-300 font-medium">não faz parte dos requisitos obrigatórios</span> do
             desafio de 4 sprints — foi implementada como aprendizado adicional.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             {[
               {
                 step: "1",
@@ -169,17 +170,17 @@ export default function Home() {
                 desc: "O pagamento é verificado automaticamente e o pedido confirmado",
               },
             ].map((item) => (
-              <div key={item.step} className="bg-slate-800/40 rounded-xl p-4 border border-slate-800">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400 mb-3">
+              <div key={item.step} className="bg-slate-800/40 rounded-xl p-5 border border-slate-800 flex flex-col items-center text-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400 mb-4">
                   {item.step}
                 </div>
-                <h4 className="text-sm font-semibold text-slate-200 mb-1">{item.title}</h4>
+                <h4 className="text-sm font-semibold text-slate-200 mb-2">{item.title}</h4>
                 <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             <a
               href="https://abacatepay.com"
               target="_blank"

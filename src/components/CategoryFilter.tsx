@@ -1,36 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getCategories } from "@/services/api";
+import { useEffect } from "react";
+import { useProducts } from "@/context/ProductsContext";
 import { getTranslatedCategory } from "@/utils/translations";
 
-interface CategoryFilterProps {
-  onCategoryChange: (category: string | null) => void;
-}
-
-export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+export function CategoryFilter() {
+  const { categories, selectedCategory, setSelectedCategory, loadCategories } = useProducts();
+  const loading = categories.length === 0;
 
   useEffect(() => {
-    async function loadCategories() {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error("Erro ao carregar categorias:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     loadCategories();
-  }, []);
+  }, [loadCategories]);
 
   const handleCategoryClick = (category: string | null) => {
     setSelectedCategory(category);
-    onCategoryChange(category);
   };
 
   if (loading) {

@@ -104,8 +104,21 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-2 text-slate-50">Criar Conta</h1>
-        <p className="text-slate-400 text-center mb-8">Junte-se ao Desenvolve Store</p>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 mb-5 shadow-lg shadow-violet-500/25">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-50 mb-1">
+            Desenvolve{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-violet-600">Store</span>
+          </h1>
+          <p className="text-sm text-slate-500">Crie sua conta e comece a explorar</p>
+        </div>
 
         {error && (
           <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl mb-6 text-sm">

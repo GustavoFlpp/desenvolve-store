@@ -23,15 +23,33 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const translatedCategory = getTranslatedCategory(product.category);
   const attributes = getProductAttributes(product.id, product.category);
 
+  // Título dinâmico: substitui valores padrão pelos selecionados
+  const dynamicTitle = attributes.reduce((title, attr) => {
+    if (attr.defaultOption && selectedAttrs[attr.label] && selectedAttrs[attr.label] !== attr.defaultOption) {
+      return title.replace(attr.defaultOption, selectedAttrs[attr.label]);
+    }
+    return title;
+  }, translatedTitle);
+
+  // Calcula multiplicador de preço baseado nos atributos selecionados
+  const priceMultiplier = attributes.reduce((mult, attr) => {
+    if (attr.priceMultiplier && selectedAttrs[attr.label]) {
+      return mult * (attr.priceMultiplier[selectedAttrs[attr.label]] ?? 1);
+    }
+    return mult;
+  }, 1);
+
+  const adjustedPrice = product.price * priceMultiplier;
+
   const formattedPrice = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
-  }).format(product.price);
+  }).format(adjustedPrice);
 
   const formattedTotal = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
-  }).format(product.price * quantity);
+  }).format(adjustedPrice * quantity);
 
   const handleAdd = () => {
     // Validate all attributes are selected
@@ -68,7 +86,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
       {/* Title */}
       <h1 className="text-2xl md:text-3xl font-bold mb-4 text-slate-50 leading-tight">
-        {translatedTitle}
+        {dynamicTitle}
       </h1>
 
       {/* Category */}
@@ -82,6 +100,20 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <span className="text-3xl font-bold text-emerald-400">{formattedPrice}</span>
           <span className="text-sm text-slate-500">/ unidade</span>
         </div>
+        {priceMultiplier !== 1 && (
+          <p className="text-sm text-slate-500 mt-1.5 flex items-center">
+            <span className="line-through">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price)}</span>
+            <span
+              className={`ml-2 text-xs font-medium px-2 py-0.5 rounded-full border ${
+                priceMultiplier > 1
+                  ? "text-rose-400 bg-rose-500/10 border-rose-500/20"
+                  : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+              }`}
+            >
+              {priceMultiplier > 1 ? "+" : "-"}{Math.abs(Math.round((priceMultiplier - 1) * 100))}%
+            </span>
+          </p>
+        )}
         {quantity > 1 && (
           <p className="text-sm text-slate-400 mt-2">
             Total: <span className="text-emerald-400 font-semibold">{formattedTotal}</span>

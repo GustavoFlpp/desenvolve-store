@@ -11,12 +11,15 @@ export default function CartPage() {
   const { cart, addToCart, decreaseFromCart, removeFromCart, clearCart } = useCart();
   const { address } = useAuth();
 
+  const SHIPPING_STORAGE_KEY = "desenvolve-store-shipping";
+
   const [shippingCep, setShippingCep] = useState("");
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
   const [shippingLoading, setShippingLoading] = useState(false);
   const [shippingError, setShippingError] = useState<string | null>(null);
   const [shippingState, setShippingState] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   const total = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -25,16 +28,51 @@ export default function CartPage() {
 
   const totalWithShipping = total + (selectedShipping?.price || 0);
 
-  // Auto-preencher CEP se o usuário já tiver endereço salvo
+  // Carregar frete salvo do localStorage ou do endereço do perfil
   useEffect(() => {
-    if (address && !shippingCep) {
+    if (initialized) return;
+
+    // Tentar carregar do localStorage primeiro
+    const saved = localStorage.getItem(SHIPPING_STORAGE_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.cep && data.estado) {
+          setShippingCep(data.cep);
+          setShippingState(data.estado);
+          const options = calculateShipping(data.estado, total);
+          setShippingOptions(options);
+          if (data.selectedId) {
+            const selected = options.find((o) => o.id === data.selectedId);
+            setSelectedShipping(selected || null);
+          }
+          setInitialized(true);
+          return;
+        }
+      } catch { /* ignore */ }
+    }
+
+    // Fallback: auto-preencher do endereço salvo do perfil
+    if (address) {
       const cep = address.cep.replace(/\D/g, "");
       setShippingCep(maskCep(cep));
       setShippingState(address.estado);
       const options = calculateShipping(address.estado, total);
       setShippingOptions(options);
     }
+    setInitialized(true);
   }, [address]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Salvar seleção de frete no localStorage
+  useEffect(() => {
+    if (!initialized) return;
+    if (shippingState && selectedShipping) {
+      localStorage.setItem(
+        SHIPPING_STORAGE_KEY,
+        JSON.stringify({ cep: shippingCep, estado: shippingState, selectedId: selectedShipping.id })
+      );
+    }
+  }, [selectedShipping, shippingCep, shippingState, initialized]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Recalcular quando total mudar e já tiver estado
   useEffect(() => {

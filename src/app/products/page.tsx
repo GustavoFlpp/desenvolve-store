@@ -1,48 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { Pagination } from "@/components/Pagination";
-import { getProducts, getProductsByCategory } from "@/services/api";
-import { Product } from "@/types/product";
+import { useProducts } from "@/context/ProductsContext";
 
 const ITEMS_PER_PAGE = 6;
 
 export default function ProductsPage() {
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      setCurrentPage(1);
-
-      let data;
-      if (selectedCategory) {
-        data = await getProductsByCategory(selectedCategory);
-      } else {
-        data = await getProducts();
-      }
-
-      setAllProducts(data);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Erro desconhecido ao carregar produtos";
-      setError(errorMessage);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    allProducts,
+    selectedCategory,
+    loading,
+    error,
+    currentPage,
+    setCurrentPage,
+    loadProducts,
+  } = useProducts();
 
   useEffect(() => {
-    loadProducts();
-  }, [selectedCategory]);
+    loadProducts(selectedCategory);
+  }, [selectedCategory, loadProducts]);
 
   const totalPages = Math.ceil(allProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -63,12 +43,12 @@ export default function ProductsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <aside className="md:col-span-1">
             <div className="sticky top-24">
-              <CategoryFilter onCategoryChange={setSelectedCategory} />
+              <CategoryFilter />
             </div>
           </aside>
 
           <section className="md:col-span-3">
-            {error && <ErrorMessage message={error} retry={loadProducts} />}
+            {error && <ErrorMessage message={error} retry={() => loadProducts(selectedCategory)} />}
 
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

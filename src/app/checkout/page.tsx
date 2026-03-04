@@ -50,6 +50,8 @@ export default function CheckoutPage() {
     cpf: "",
   });
 
+  const SHIPPING_STORAGE_KEY = "desenvolve-store-shipping";
+
   // Endereço de entrega
   const [shippingCep, setShippingCep] = useState("");
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
@@ -61,9 +63,34 @@ export default function CheckoutPage() {
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const totalWithShipping = total + (selectedShipping?.price || 0);
 
-  // Auto-preencher endereço salvo
+  // Carregar frete salvo do localStorage, endereço do perfil, ou calcular
   useEffect(() => {
-    if (address && !shippingCep) {
+    // 1. Tentar restaurar do localStorage (vem do carrinho)
+    const saved = localStorage.getItem(SHIPPING_STORAGE_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.cep && data.estado) {
+          setShippingCep(data.cep);
+          const options = calculateShipping(data.estado, total);
+          setShippingOptions(options);
+          if (data.selectedId) {
+            const selected = options.find((o) => o.id === data.selectedId);
+            setSelectedShipping(selected || null);
+          }
+          // Montar endereço de entrega
+          if (address) {
+            setDeliveryAddress(
+              `${address.logradouro}, ${address.numero}${address.complemento ? " - " + address.complemento : ""} — ${address.bairro}, ${address.cidade}/${address.estado}`
+            );
+          }
+          return;
+        }
+      } catch { /* ignore */ }
+    }
+
+    // 2. Fallback: endereço salvo do perfil
+    if (address) {
       const cep = address.cep.replace(/\D/g, "");
       setShippingCep(maskCep(cep));
       setDeliveryAddress(
@@ -88,6 +115,19 @@ export default function CheckoutPage() {
       }
     }
   }, [total]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Salvar seleção de frete no localStorage quando mudar
+  useEffect(() => {
+    if (selectedShipping && shippingCep) {
+      const estado = deliveryAddress?.split("/").pop()?.trim() || "";
+      if (estado) {
+        localStorage.setItem(
+          SHIPPING_STORAGE_KEY,
+          JSON.stringify({ cep: shippingCep, estado, selectedId: selectedShipping.id })
+        );
+      }
+    }
+  }, [selectedShipping, shippingCep, deliveryAddress]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCalcShipping = async () => {
     const clean = shippingCep.replace(/\D/g, "");
@@ -119,7 +159,7 @@ export default function CheckoutPage() {
       <main className="max-w-4xl mx-auto p-6 text-center py-20">
         <h1 className="text-2xl font-bold mb-4 text-slate-50">Acesso Restrito</h1>
         <p className="text-slate-400 mb-6">Você precisa estar autenticado para realizar o checkout.</p>
-        <Link href="/login" className="bg-violet-600 text-white px-6 py-2.5 rounded-xl hover:bg-violet-500 transition font-semibold">
+        <Link href="/login" className="bg-violet-600 text-white px-6 py-2.5 rounded-xl hover:bg-violet-500 transition font-semibold cursor-pointer">
           Fazer Login
         </Link>
       </main>
@@ -131,7 +171,7 @@ export default function CheckoutPage() {
       <main className="max-w-4xl mx-auto p-6 text-center py-20">
         <h1 className="text-2xl font-bold mb-4 text-slate-50">Carrinho Vazio</h1>
         <p className="text-slate-400 mb-6">Adicione produtos antes de fazer checkout.</p>
-        <Link href="/products" className="bg-violet-600 text-white px-6 py-2.5 rounded-xl hover:bg-violet-500 transition font-semibold">
+        <Link href="/products" className="bg-violet-600 text-white px-6 py-2.5 rounded-xl hover:bg-violet-500 transition font-semibold cursor-pointer">
           Voltar para Produtos
         </Link>
       </main>
@@ -266,7 +306,7 @@ export default function CheckoutPage() {
                 <button
                   onClick={handleCalcShipping}
                   disabled={shippingLoading}
-                  className="bg-violet-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-violet-500 transition disabled:bg-slate-700 disabled:text-slate-500"
+                  className="bg-violet-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-violet-500 transition disabled:bg-slate-700 disabled:text-slate-500 cursor-pointer"
                 >
                   {shippingLoading ? (
                     <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
@@ -390,14 +430,14 @@ export default function CheckoutPage() {
             <button
               onClick={handleCreatePixQrCode}
               disabled={loading}
-              className="w-full bg-violet-600 text-white py-3 rounded-xl font-semibold hover:bg-violet-500 transition disabled:bg-slate-700 disabled:text-slate-500"
+              className="w-full bg-violet-600 text-white py-3 rounded-xl font-semibold hover:bg-violet-500 transition disabled:bg-slate-700 disabled:text-slate-500 cursor-pointer"
             >
               {loading ? "Gerando QR Code..." : "Continuar para Pagamento"}
             </button>
 
             <Link
               href="/cart"
-              className="block text-center mt-3 text-slate-400 hover:text-violet-400 text-sm transition"
+              className="block text-center mt-3 text-slate-400 hover:text-violet-400 text-sm transition cursor-pointer"
             >
               ← Voltar para Carrinho
             </Link>
@@ -409,6 +449,7 @@ export default function CheckoutPage() {
       {step === "payment" && qrCode && qrCode.data && (
         <div className="max-w-md mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-center text-slate-50">Pagamento PIX</h1>
+          <p className="text-center text-xs text-slate-500 -mt-4 mb-6">(funcionalidade extra educacional — não obrigatória para o desafio)</p>
 
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
             <p className="text-slate-400 mb-6">
@@ -446,14 +487,14 @@ export default function CheckoutPage() {
             <button
               onClick={handleSimulatePayment}
               disabled={loading}
-              className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-500 transition disabled:bg-slate-700 disabled:text-slate-500 mb-3"
+              className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-500 transition disabled:bg-slate-700 disabled:text-slate-500 mb-3 cursor-pointer"
             >
               {loading ? "Processando..." : "Simular Pagamento"}
             </button>
 
             <button
               onClick={() => setStep("review")}
-              className="w-full border border-slate-700 text-slate-300 py-3 rounded-xl font-semibold hover:bg-slate-800 transition"
+              className="w-full border border-slate-700 text-slate-300 py-3 rounded-xl font-semibold hover:bg-slate-800 transition cursor-pointer"
             >
               Voltar
             </button>
@@ -479,7 +520,7 @@ export default function CheckoutPage() {
 
           <Link
             href="/products"
-            className="inline-block bg-violet-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-violet-500 transition"
+            className="inline-block bg-violet-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-violet-500 transition cursor-pointer"
           >
             Continuar Comprando
           </Link>

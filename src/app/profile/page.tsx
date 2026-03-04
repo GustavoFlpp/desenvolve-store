@@ -296,7 +296,7 @@ export default function ProfilePage() {
             <p className="text-sm text-slate-500">{user.email}</p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs text-violet-400 hover:text-violet-300 transition mt-1"
+              className="text-xs text-violet-400 hover:text-violet-300 transition mt-1 cursor-pointer"
             >
               Alterar foto
             </button>
@@ -310,7 +310,7 @@ export default function ProfilePage() {
             {!editingInfo && (
               <button
                 onClick={() => { setEditingInfo(true); setError(null); }}
-                className="text-sm text-violet-400 hover:text-violet-300 transition font-medium"
+                className="text-sm text-violet-400 hover:text-violet-300 transition font-medium cursor-pointer"
               >
                 Editar
               </button>
@@ -342,7 +342,7 @@ export default function ProfilePage() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleSaveInfo}
-                  className="bg-violet-600 text-white px-5 py-2.5 rounded-xl hover:bg-violet-500 transition text-sm font-semibold shadow-lg shadow-violet-600/20"
+                  className="bg-violet-600 text-white px-5 py-2.5 rounded-xl hover:bg-violet-500 transition text-sm font-semibold shadow-lg shadow-violet-600/20 cursor-pointer"
                 >
                   Salvar
                 </button>
@@ -352,7 +352,7 @@ export default function ProfilePage() {
                     setError(null);
                     if (user) setFormData({ username: user.username, email: user.email });
                   }}
-                  className="border border-slate-700 text-slate-300 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium"
+                  className="border border-slate-700 text-slate-300 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -379,7 +379,7 @@ export default function ProfilePage() {
             {!editingPassword && (
               <button
                 onClick={() => { setEditingPassword(true); setError(null); }}
-                className="text-sm text-violet-400 hover:text-violet-300 transition font-medium"
+                className="text-sm text-violet-400 hover:text-violet-300 transition font-medium cursor-pointer"
               >
                 Alterar
               </button>
@@ -424,7 +424,7 @@ export default function ProfilePage() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleSavePassword}
-                  className="bg-violet-600 text-white px-5 py-2.5 rounded-xl hover:bg-violet-500 transition text-sm font-semibold shadow-lg shadow-violet-600/20"
+                  className="bg-violet-600 text-white px-5 py-2.5 rounded-xl hover:bg-violet-500 transition text-sm font-semibold shadow-lg shadow-violet-600/20 cursor-pointer"
                 >
                   Salvar senha
                 </button>
@@ -434,7 +434,7 @@ export default function ProfilePage() {
                     setError(null);
                     setPassword({ current: "", newPass: "", confirm: "" });
                   }}
-                  className="border border-slate-700 text-slate-300 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium"
+                  className="border border-slate-700 text-slate-300 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -452,7 +452,7 @@ export default function ProfilePage() {
             {!editingAddress && (
               <button
                 onClick={() => { setEditingAddress(true); setError(null); }}
-                className="text-sm text-violet-400 hover:text-violet-300 transition font-medium"
+                className="text-sm text-violet-400 hover:text-violet-300 transition font-medium cursor-pointer"
               >
                 {address ? "Editar" : "Adicionar"}
               </button>
@@ -554,7 +554,7 @@ export default function ProfilePage() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleSaveAddress}
-                  className="bg-violet-600 text-white px-5 py-2.5 rounded-xl hover:bg-violet-500 transition text-sm font-semibold shadow-lg shadow-violet-600/20"
+                  className="bg-violet-600 text-white px-5 py-2.5 rounded-xl hover:bg-violet-500 transition text-sm font-semibold shadow-lg shadow-violet-600/20 cursor-pointer"
                 >
                   Salvar endereço
                 </button>
@@ -564,14 +564,14 @@ export default function ProfilePage() {
                     setError(null);
                     if (address) setAddressForm(address);
                   }}
-                  className="border border-slate-700 text-slate-300 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium"
+                  className="border border-slate-700 text-slate-300 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium cursor-pointer"
                 >
                   Cancelar
                 </button>
                 {address && (
                   <button
                     onClick={handleRemoveAddress}
-                    className="border border-rose-500/30 text-rose-400 px-5 py-2.5 rounded-xl hover:bg-rose-500/10 transition text-sm font-medium ml-auto"
+                    className="border border-rose-500/30 text-rose-400 px-5 py-2.5 rounded-xl hover:bg-rose-500/10 transition text-sm font-medium ml-auto cursor-pointer"
                   >
                     Remover
                   </button>
@@ -604,7 +604,7 @@ export default function ProfilePage() {
           </p>
           <button
             onClick={handleDeleteAccount}
-            className="border border-rose-500/30 text-rose-400 px-5 py-2.5 rounded-xl hover:bg-rose-500/10 transition text-sm font-medium"
+            className="border border-rose-500/30 text-rose-400 px-5 py-2.5 rounded-xl hover:bg-rose-500/10 transition text-sm font-medium cursor-pointer"
           >
             Excluir conta
           </button>
