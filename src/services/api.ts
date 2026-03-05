@@ -8,10 +8,10 @@ import {
   AbacatePayCheckResponse
 } from "@/types/payment";
 
-const BASE_URL = "/api";
+const BASE_URL = "https://fakestoreapi.com";
 
 export async function getProducts(): Promise<Product[]> {
-  const response = await fetch(`${BASE_URL}/products`);
+  const response = await fetch(`${BASE_URL}/products`, { cache: "force-cache" });
 
   if (!response.ok) {
     throw new Error("Erro ao buscar produtos");
@@ -21,7 +21,7 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getProductById(id: string): Promise<Product> {
-  const response = await fetch(`${BASE_URL}/products/${id}`);
+  const response = await fetch(`${BASE_URL}/products/${id}`, { cache: "force-cache" });
 
   if (!response.ok) {
     throw new Error("Erro ao buscar produto");
@@ -31,7 +31,7 @@ export async function getProductById(id: string): Promise<Product> {
 }
 
 export async function getCategories(): Promise<string[]> {
-  const response = await fetch(`${BASE_URL}/categories`);
+  const response = await fetch(`${BASE_URL}/products/categories`, { cache: "force-cache" });
 
   if (!response.ok) {
     throw new Error("Erro ao buscar categorias");
@@ -43,7 +43,7 @@ export async function getCategories(): Promise<string[]> {
 export async function getProductsByCategory(
   category: string
 ): Promise<Product[]> {
-  const response = await fetch(`${BASE_URL}/products?category=${encodeURIComponent(category)}`);
+  const response = await fetch(`${BASE_URL}/products/category/${category}`, { cache: "force-cache" });
 
   if (!response.ok) {
     throw new Error("Erro ao buscar produtos da categoria");
