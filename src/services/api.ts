@@ -8,7 +8,7 @@ import {
   AbacatePayCheckResponse
 } from "@/types/payment";
 
-const BASE_URL = "https://fakestoreapi.com";
+const BASE_URL = "/api";
 
 export async function getProducts(): Promise<Product[]> {
   const response = await fetch(`${BASE_URL}/products`);
@@ -31,7 +31,7 @@ export async function getProductById(id: string): Promise<Product> {
 }
 
 export async function getCategories(): Promise<string[]> {
-  const response = await fetch(`${BASE_URL}/products/categories`);
+  const response = await fetch(`${BASE_URL}/categories`);
 
   if (!response.ok) {
     throw new Error("Erro ao buscar categorias");
@@ -43,7 +43,7 @@ export async function getCategories(): Promise<string[]> {
 export async function getProductsByCategory(
   category: string
 ): Promise<Product[]> {
-  const response = await fetch(`${BASE_URL}/products/category/${category}`);
+  const response = await fetch(`${BASE_URL}/products?category=${encodeURIComponent(category)}`);
 
   if (!response.ok) {
     throw new Error("Erro ao buscar produtos da categoria");
