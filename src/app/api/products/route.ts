@@ -9,7 +9,9 @@ export async function GET(request: Request) {
     }
 
     const response = await fetch(url, {
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; DeveloveStore/1.0)",
+      },
     });
 
     if (!response.ok) {

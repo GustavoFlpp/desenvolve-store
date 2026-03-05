@@ -1,7 +1,9 @@
 export async function GET() {
   try {
     const response = await fetch("https://fakestoreapi.com/products/categories", {
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; DeveloveStore/1.0)",
+      },
     });
 
     if (!response.ok) {
