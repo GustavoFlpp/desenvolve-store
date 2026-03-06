@@ -52,30 +52,37 @@ export default function SignupPage() {
 
     try {
       setIsLoading(true);
+      console.log("[SIGNUP] Iniciando criação de usuário:", formData.username);
 
       // Criar usuário
-      await createUser({
+      const newUser = await createUser({
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
+      console.log("[SIGNUP] Usuário criado com sucesso:", newUser);
 
       setSuccess(true);
+      console.log("[SIGNUP] Estado de sucesso ativado, aguardando 2s antes do login");
 
       // Fazer login automaticamente após 2 segundos
       setTimeout(() => {
         try {
-          // Fazer login direto no contexto (simular login bem-sucedido)
-          // O usuário foi criado, então autorizar automaticamente
-          localStorage.setItem("desenvolve-store-auth", JSON.stringify({
+          console.log("[SIGNUP] Iniciando salvamento no localStorage");
+          const authData = {
             id: 1,
             username: formData.username,
             email: formData.email,
-          }));
+          };
+          console.log("[SIGNUP] Dados a salvar:", authData);
+          localStorage.setItem("desenvolve-store-auth", JSON.stringify(authData));
           localStorage.setItem("desenvolve-store-token", "fake-token-" + Date.now());
+          console.log("[SIGNUP] Dados salvos no localStorage");
+          console.log("[SIGNUP] Verificando localStorage:", localStorage.getItem("desenvolve-store-auth"));
+          console.log("[SIGNUP] Redirecionando para /products");
           router.push("/products");
         } catch (loginError) {
-          console.error("Erro ao fazer login após cadastro:", loginError);
+          console.error("[SIGNUP] Erro ao fazer login após cadastro:", loginError);
           router.push("/login");
         }
       }, 2000);

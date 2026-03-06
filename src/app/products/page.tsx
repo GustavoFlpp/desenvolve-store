@@ -6,6 +6,7 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { Pagination } from "@/components/Pagination";
 import { useProducts } from "@/context/ProductsContext";
+import { useAuth } from "@/context/AuthContext";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -19,6 +20,12 @@ export default function ProductsPage() {
     setCurrentPage,
     loadProducts,
   } = useProducts();
+
+  const { user, isAuthenticated } = useAuth();
+  
+  useEffect(() => {
+    console.log("[PRODUCTS] Página carregada. User:", user, "Autenticado:", isAuthenticated);
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     loadProducts(selectedCategory);

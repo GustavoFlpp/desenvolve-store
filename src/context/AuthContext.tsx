@@ -39,18 +39,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Carregar dados de autenticação ao montar
   useEffect(() => {
+    console.log("[AUTH] Montando AuthContext, carregando dados do localStorage");
     const savedUser = localStorage.getItem(AUTH_STORAGE_KEY);
     const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+    console.log("[AUTH] savedUser:", savedUser);
+    console.log("[AUTH] savedToken:", savedToken);
 
     if (savedUser && savedToken) {
       try {
-        setUser(JSON.parse(savedUser));
+        console.log("[AUTH] Parseando usuário salvo");
+        const parsedUser = JSON.parse(savedUser);
+        console.log("[AUTH] Usuário parseado:", parsedUser);
+        setUser(parsedUser);
         setToken(savedToken);
+        console.log("[AUTH] Usuário e token carregados com sucesso");
       } catch (err) {
-        console.error("Erro ao carregar autenticação:", err);
+        console.error("[AUTH] Erro ao carregar autenticação:", err);
         localStorage.removeItem(AUTH_STORAGE_KEY);
         localStorage.removeItem(TOKEN_STORAGE_KEY);
       }
+    } else {
+      console.log("[AUTH] Nenhum usuário ou token salvo");
     }
     const savedAvatar = localStorage.getItem(AVATAR_STORAGE_KEY);
     if (savedAvatar) setAvatar(savedAvatar);
