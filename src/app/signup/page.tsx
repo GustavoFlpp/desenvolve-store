@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createUser } from "@/services/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const { loginOffline } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,20 +68,14 @@ export default function SignupPage() {
       console.log("[SIGNUP] Estado de sucesso ativado, aguardando 2s antes do login");
 
       // Fazer login automaticamente após 2 segundos
-      setTimeout(() => {
+      setTimeout(async () => {
         try {
-          console.log("[SIGNUP] Iniciando salvamento no localStorage");
-          const authData = {
-            id: 1,
+          console.log("[SIGNUP] Iniciando loginOffline");
+          await loginOffline({
             username: formData.username,
             email: formData.email,
-          };
-          console.log("[SIGNUP] Dados a salvar:", authData);
-          localStorage.setItem("desenvolve-store-auth", JSON.stringify(authData));
-          localStorage.setItem("desenvolve-store-token", "fake-token-" + Date.now());
-          console.log("[SIGNUP] Dados salvos no localStorage");
-          console.log("[SIGNUP] Verificando localStorage:", localStorage.getItem("desenvolve-store-auth"));
-          console.log("[SIGNUP] Redirecionando para /products");
+          });
+          console.log("[SIGNUP] LoginOffline bem-sucedido, redirecionando para /products");
           router.push("/products");
         } catch (loginError) {
           console.error("[SIGNUP] Erro ao fazer login após cadastro:", loginError);

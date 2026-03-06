@@ -14,6 +14,7 @@ interface AuthContextData {
   isLoading: boolean;
   error: string | null;
   loginUser: (credentials: LoginCredentials) => Promise<void>;
+  loginOffline: (user: Omit<User, "id">) => Promise<void>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
   updateAvatar: (base64: string) => void;
@@ -103,6 +104,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const loginOffline = async (userData: Omit<User, "id">) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log("[AUTH] loginOffline: Fazendo login offline com:", userData);
+
+      const fullUser: User = {
+        id: 1,
+        ...userData,
+      };
+
+      const token = "fake-token-" + Date.now();
+
+      // Salvar dados no localStorage
+      setToken(token);
+      setUser(fullUser);
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(fullUser));
+      localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      console.log("[AUTH] loginOffline: Login bem-sucedido, dados salvos");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erro ao fazer login offline";
+      setError(errorMessage);
+      console.error("[AUTH] loginOffline error:", errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -148,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         error,
         loginUser,
+        loginOffline,
         logout,
         updateUser,
         updateAvatar,
