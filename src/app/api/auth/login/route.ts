@@ -1,31 +1,28 @@
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log("[API] POST /api/auth/login - user:", body.username);
+    const { username, password } = body;
+    
+    console.log("[API] POST /api/auth/login - user:", username);
 
-    const response = await fetch("https://fakestoreapi.com/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-      body: JSON.stringify(body),
-    });
-
-    console.log(`[API] Response status: ${response.status}`);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error("[API] Login failed:", errorData);
+    // Validação básica
+    if (!username || !password) {
+      console.error("[API] Username ou password inválido");
       return Response.json(
-        { error: "Falha ao fazer login" },
-        { status: response.status }
+        { error: "Username e password são obrigatórios" },
+        { status: 400 }
       );
     }
 
-    const data = await response.json();
-    console.log("[API] Login successful");
-    return Response.json(data);
+    // Fazer login local simulado (aceita qualquer username/password)
+    // Já que o Fake Store API não persiste dados
+    const token = "fake-token-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
+    console.log("[API] Login bem-sucedido (simulado), gerando token:", token);
+
+    return Response.json({
+      token,
+      username,
+    });
   } catch (error) {
     console.error("[API] Error in login:", error);
     return Response.json(

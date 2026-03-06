@@ -13,11 +13,15 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[LOGIN] Iniciando login com username:", username);
 
     try {
+      console.log("[LOGIN] Chamando loginUser");
       await loginUser({ username, password });
+      console.log("[LOGIN] Login bem-sucedido, redirecionando para /products");
       router.push("/products");
-    } catch {
+    } catch (err) {
+      console.error("[LOGIN] Erro ao fazer login:", err);
       // Erro já é tratado no contexto
     }
   };

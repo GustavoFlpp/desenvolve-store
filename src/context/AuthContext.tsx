@@ -80,8 +80,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
+      console.log("[AUTH] loginUser: começando login com username:", credentials.username);
 
       const authResponse: AuthResponse = await login(credentials);
+      console.log("[AUTH] loginUser: resposta da API recebida:", authResponse);
 
       // Buscar dados do usuário (simulamos pegando o username)
       const userData: User = {
@@ -91,12 +93,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
 
       // Salvar dados
+      console.log("[AUTH] loginUser: salvando token e usuário");
       setToken(authResponse.token);
       setUser(userData);
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
       localStorage.setItem(TOKEN_STORAGE_KEY, authResponse.token);
+      console.log("[AUTH] loginUser: login bem-sucedido");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erro ao fazer login";
+      console.error("[AUTH] loginUser: erro durante login:", errorMessage);
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
