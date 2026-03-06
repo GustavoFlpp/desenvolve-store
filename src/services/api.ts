@@ -66,7 +66,7 @@ export async function getProductsByCategory(
 // ==================== AUTH ====================
 
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
-  const response = await fetch(`${BASE_URL}/auth/login`, {
+  const response = await fetch(`${BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
@@ -82,7 +82,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
 // ==================== USERS ====================
 
 export async function getUsers(): Promise<User[]> {
-  const response = await fetch(`${BASE_URL}/users`);
+  const response = await fetch(`${BASE_URL}/api/users`);
 
   if (!response.ok) {
     throw new Error("Erro ao buscar usuários");
@@ -92,7 +92,7 @@ export async function getUsers(): Promise<User[]> {
 }
 
 export async function getUserById(id: number): Promise<User> {
-  const response = await fetch(`${BASE_URL}/users/${id}`);
+  const response = await fetch(`${BASE_URL}/api/users/${id}`);
 
   if (!response.ok) {
     throw new Error("Erro ao buscar usuário");
@@ -102,7 +102,7 @@ export async function getUserById(id: number): Promise<User> {
 }
 
 export async function createUser(user: Omit<User, "id">): Promise<User> {
-  const response = await fetch(`${BASE_URL}/users`, {
+  const response = await fetch(`${BASE_URL}/api/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(user),
