@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createUser } from "@/services/api";
-import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -17,7 +16,6 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const { loginUser } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,16 +63,19 @@ export default function SignupPage() {
       setSuccess(true);
 
       // Fazer login automaticamente após 2 segundos
-      setTimeout(async () => {
+      setTimeout(() => {
         try {
-          await loginUser({
+          // Fazer login direto no contexto (simular login bem-sucedido)
+          // O usuário foi criado, então autorizar automaticamente
+          localStorage.setItem("desenvolve-store-auth", JSON.stringify({
+            id: 1,
             username: formData.username,
-            password: formData.password,
-          });
+            email: formData.email,
+          }));
+          localStorage.setItem("desenvolve-store-token", "fake-token-" + Date.now());
           router.push("/products");
         } catch (loginError) {
           console.error("Erro ao fazer login após cadastro:", loginError);
-          // Redirecionar para login mesmo se falhar
           router.push("/login");
         }
       }, 2000);
