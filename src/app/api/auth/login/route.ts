@@ -1,9 +1,11 @@
+import { findUserByCredentials } from "@/lib/users-db";
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { username, password } = body;
     
-    console.log("[API] POST /api/auth/login - user:", username);
+    console.log("[API] POST /api/auth/login - tentando logar com user:", username);
 
     // Validação básica
     if (!username || !password) {
@@ -14,14 +16,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fazer login local simulado (aceita qualquer username/password)
-    // Já que o Fake Store API não persiste dados
+    // Validar credenciais contra o banco de dados
+    const user = findUserByCredentials(username, password);
+
+    if (!user) {
+      console.error("[API] Credenciais inválidas para user:", username);
+      return Response.json(
+        { error: "Username ou senha inválidos" },
+        { status: 401 }
+      );
+    }
+
+    // Gerar token
     const token = "fake-token-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
-    console.log("[API] Login bem-sucedido (simulado), gerando token:", token);
+    console.log("[API] Credenciais validadas, token gerado para user:", username);
 
     return Response.json({
       token,
-      username,
+      username: user.username,
+      email: user.email,
     });
   } catch (error) {
     console.error("[API] Error in login:", error);
