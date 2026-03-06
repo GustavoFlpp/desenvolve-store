@@ -1,9 +1,11 @@
+import { NextRequest } from "next/server";
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const response = await fetch(
       `https://fakestoreapi.com/products/${id}`
@@ -18,7 +20,6 @@ export async function GET(
 
     const data = await response.json();
     return Response.json(data);
-
   } catch (error) {
     console.error("Error fetching product:", error);
 
