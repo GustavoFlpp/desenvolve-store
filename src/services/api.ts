@@ -8,8 +8,7 @@ import {
   AbacatePayCheckResponse
 } from "@/types/payment";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://fakestoreapi.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
 export async function getProducts(): Promise<Product[]> {
   const response = await fetch(`${BASE_URL}/api/products`, {
