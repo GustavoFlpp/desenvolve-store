@@ -1,0 +1,4 @@
+{
+  "crons": [],
+  "buildCommand": "npm run build"
+}
