@@ -11,7 +11,11 @@ export async function GET(
     const url = `https://fakestoreapi.com/products/${id}`;
     console.log(`[API] URL: ${url}`);
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    });
     console.log(`[API] Response status: ${response.status}`);
 
     if (!response.ok) {

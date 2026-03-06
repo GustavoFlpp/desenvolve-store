@@ -2,7 +2,12 @@ export async function GET() {
   try {
     console.log("[API] GET /api/categories");
     const response = await fetch(
-      "https://fakestoreapi.com/products/categories"
+      "https://fakestoreapi.com/products/categories",
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+      }
     );
 
     console.log(`[API] Response status: ${response.status}`);
