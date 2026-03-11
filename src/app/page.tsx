@@ -16,7 +16,7 @@ export default function Home() {
         </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold mb-8 text-slate-50 leading-[1.1] tracking-tight animate-[fadeIn_0.8s_ease-out]">
-          Bem-vindo à{" "}
+          Bem-vindo a{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-purple-400 to-violet-600 animate-[gradient_3s_ease_infinite] bg-[length:200%_auto]">
             Desenvolve Store
           </span>
