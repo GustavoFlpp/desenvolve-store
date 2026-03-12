@@ -8,11 +8,13 @@ interface ProductsContextData {
   allProducts: Product[];
   categories: string[];
   selectedCategory: string | null;
+  searchQuery: string;
   loading: boolean;
   error: string | null;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   setSelectedCategory: (category: string | null) => void;
+  setSearchQuery: (query: string) => void;
   loadProducts: (category?: string | null) => Promise<void>;
   loadCategories: () => Promise<void>;
 }
@@ -26,6 +28,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQueryState] = useState("");
 
   // Cache: guarda produtos por categoria (null = todos)
   const cacheRef = useRef<Map<string, Product[]>>(new Map());
@@ -80,17 +83,24 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     setCurrentPage(1);
   }, []);
 
+  const setSearchQuery = useCallback((query: string) => {
+    setSearchQueryState(query);
+    setCurrentPage(1);
+  }, []);
+
   return (
     <ProductsContext.Provider
       value={{
         allProducts,
         categories,
         selectedCategory,
+        searchQuery,
         loading,
         error,
         currentPage,
         setCurrentPage,
         setSelectedCategory,
+        setSearchQuery,
         loadProducts,
         loadCategories,
       }}

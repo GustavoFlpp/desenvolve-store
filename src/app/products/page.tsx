@@ -14,6 +14,7 @@ export default function ProductsPage() {
   const {
     allProducts,
     selectedCategory,
+    searchQuery,
     loading,
     error,
     currentPage,
@@ -31,10 +32,16 @@ export default function ProductsPage() {
     loadProducts(selectedCategory);
   }, [selectedCategory, loadProducts]);
 
-  const totalPages = Math.ceil(allProducts.length / ITEMS_PER_PAGE);
+  const filteredProducts = searchQuery
+    ? allProducts.filter((p) =>
+        p.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : allProducts;
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentProducts = allProducts.slice(startIndex, endIndex);
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-[calc(100vh-73px)] relative overflow-x-hidden">
@@ -95,7 +102,7 @@ export default function ProductsPage() {
                   onPageChange={setCurrentPage}
                   startIndex={startIndex}
                   endIndex={endIndex}
-                  total={allProducts.length}
+                  total={filteredProducts.length}
                 />
               </>
             )}

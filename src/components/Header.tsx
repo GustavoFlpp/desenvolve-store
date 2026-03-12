@@ -1,13 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useProducts } from "@/context/ProductsContext";
 import { CartItem } from "@/types/cart";
 
 export function Header() {
   const { cart } = useCart();
   const { isAuthenticated, user, avatar, logout } = useAuth();
+  const { searchQuery, setSearchQuery } = useProducts();
+  const pathname = usePathname();
+
+  const showSearch = pathname === "/products";
 
   const totalItems = cart.reduce(
     (acc: number, item: CartItem) => acc + item.quantity,
@@ -29,6 +35,45 @@ export function Header() {
             Desenvolve <span className="text-violet-400">Store</span>
           </span>
         </Link>
+
+        {showSearch && (
+          <div className="hidden md:flex flex-1 max-w-md mx-6">
+            <div className="relative w-full">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar produtos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition cursor-pointer"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         <nav className="flex items-center gap-1">
           <Link href="/products" className="text-sm text-slate-400 hover:text-violet-400 hover:bg-violet-500/5 transition px-3.5 py-2 rounded-xl font-medium">
