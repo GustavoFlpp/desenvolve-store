@@ -94,20 +94,6 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 pt-6 border-t border-slate-800">
-          <p className="text-sm text-slate-400 text-center mb-4">Credenciais de teste:</p>
-          <div className="bg-slate-800 p-4 rounded-xl text-sm space-y-2 border border-slate-700">
-            <p className="text-slate-300">
-              <strong className="text-slate-200">Usuário:</strong>{" "}
-              <code className="bg-slate-900 px-2 py-1 rounded text-violet-400">johnd</code>
-            </p>
-            <p className="text-slate-300">
-              <strong className="text-slate-200">Senha:</strong>{" "}
-              <code className="bg-slate-900 px-2 py-1 rounded text-violet-400">m38rmF$</code>
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-slate-800">
           <p className="text-sm text-slate-400 text-center mb-3">
             Ainda não tem conta?{" "}
             <Link href="/signup" className="text-violet-400 hover:text-violet-300 font-semibold transition">
