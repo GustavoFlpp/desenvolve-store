@@ -24,39 +24,19 @@ Desenvolve Store é um portal de compras que demonstra habilidades em:
 | **Tailwind CSS** | 4.x |
 | **Node.js** | 18+ |
 
-## 📦 Funcionalidades Implementadas
+## 📦 O Que Precisa Ser Implementado
 
-### Sprint 1 - Estrutura Base ✅
-- [x] Setup com Next.js
-- [x] Header funcional com logo e navegação
-- [x] Consumo do endpoint `/products`
-- [x] Grid de produtos responsivo
-- [x] Componente ProductCard com imagem, título e preço
+### Funcionalidades Obrigatórias ✨
+Implemente as funcionalidades principais de um e-commerce:
+- Consumo de APIs REST
+- Gerenciamento de estado global
+- Roteamento dinâmico
+- Persistência de dados
+- Componentização em React
+- Estilização responsiva
+- TypeScript para type safety
 
-### Sprint 2 - Navegação e Filtros ✅
-- [x] Roteamento com App Router
-- [x] Página inicial (home)
-- [x] Página de detalhes do produto (`/product/:id`)
-- [x] Menu de categorias funcional
-- [x] Filtro por categoria dinâmico
-
-### Sprint 3 - Carrinho e Estado ✅
-- [x] Context API para gerenciar estado global
-- [x] Adicionar produtos ao carrinho (com incremento automático)
-- [x] Remover itens do carrinho
-- [x] Diminuir quantidade sem remover
-- [x] Cálculo em tempo real do total
-- [x] Página de carrinho com CRUD completo
-- [x] Loading skeletons durante busca de dados
-
-### Sprint 4 - Organização e UX ✅
-- [x] Arquitetura de pastas organizada
-- [x] Persistência com localStorage (carrinho salvo ao recarregar)
-- [x] README profissional
-- [x] Tratamento de erros em requisições
-- [x] Componentes TypeScript bem tipados
-
-### Extras Educacionais (Opcional) ✨
+### Extras Educacionais (Opcional) 🎁
 > As funcionalidades abaixo **não fazem parte dos requisitos obrigatórios** do desafio.
 > Foram implementadas como aprendizado adicional e exploração de conceitos reais de mercado.
 
